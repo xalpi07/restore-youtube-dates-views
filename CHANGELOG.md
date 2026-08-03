@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.12]
+
+### Documentation
+
+- Added a "Background" section to the README explaining YouTube's
+  abbreviated-metadata rollout (the `desktop_enable_new_video_metadata` and
+  `web_official_card_concise_lockup_metadata` experiment flags) and how to
+  reproduce the check.
+
 ## [1.1.11]
 
 ### Fixed
