@@ -9,6 +9,11 @@ function getLocale(code = DEFAULT_LOCALE) {
 const _dateRegexCache = new Map();
 let _viewsRegex = null;
 
+// Valores que en realidad son resoluciones de vídeo, no contadores de vistas.
+// Solo se bloquean cuando aparecen "desnudos" (sin espacio ni la palabra
+// "vistas/views"), p. ej. el menú de calidad muestra "4K".
+const RESOLUTION_BLOCKLIST = new Set(['2K', '4K', '8K']);
+
 function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -24,7 +29,8 @@ function getDateRegex(locale, code) {
     .sort((a, b) => b.length - a.length)
     .join('|');
   const adverb = escapeRegExp(locale.dateAdverb).replace(/\s+/g, '\\s+');
-  const unit = `(\\d+)\\s+(${tokens})\\.?`;
+  // El espacio entre número y unidad es opcional: "hace 3 m" y "1mo ago".
+  const unit = `(\\d+)\\s*(${tokens})\\.?`;
   const body = locale.adverbPosition === 'after'
     ? `${unit}\\s+${adverb}`
     : `${adverb}\\s+${unit}`;
@@ -34,13 +40,15 @@ function getDateRegex(locale, code) {
   return regex;
 }
 
-// Exige un espacio entre número y sufijo ("13 K"), de modo que "4K"
-// (resolución de vídeo) no coincide. El decimal admite coma o punto.
+// Grupos: 1) número  2) espacio (opcional)  3) sufijo K/M/B  4) palabra de
+// vistas (opcional, multi-idioma). El decimal admite coma o punto. Si detrás
+// del sufijo hay una palabra desconocida (p. ej. "subscribers"), no coincide.
 function getViewsRegex() {
   if (_viewsRegex) return _viewsRegex;
+  const words = 'vistas?|reproducciones?|views?|vues?|aufrufe|visualiza\\p{L}+';
   _viewsRegex = new RegExp(
-    '^\\s*(\\d+(?:[.,]\\d+)?)\\s+([KMB])\\s*(?:de\\s+)?(?:vistas?|reproducciones?|views?)?\\s*$',
-    'i',
+    `^\\s*(\\d+(?:[.,]\\d+)?)(\\s*)([KMB])\\s*(?:de\\s+)?(${words})?\\s*$`,
+    'iu',
   );
   return _viewsRegex;
 }
@@ -74,7 +82,11 @@ function transformViews(text, locale) {
   if (!match) return null;
 
   const number = match[1];
-  const cfg = locale.views[match[2].toUpperCase()];
+  const suffix = match[3].toUpperCase();
+  const bare = match[2] === '' && !match[4]; // sin espacio ni palabra
+  if (bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) return null;
+
+  const cfg = locale.views[suffix];
   if (!cfg) return null;
 
   const template = number === '1' ? cfg.one : cfg.other;

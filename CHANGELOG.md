@@ -5,6 +5,16 @@ Todas las novedades relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.1.1]
+
+### Corregido
+
+- Formatos sin espacios (interfaz en inglés y otras): `1mo ago` → `1 month ago`
+  y `128K` → `128 thousand views`. El espacio entre número y unidad/sufijo
+  ahora es opcional.
+- Se sigue protegiendo `2K`/`4K`/`8K` (resoluciones de vídeo) y textos que no
+  son vistas (p. ej. `5M subscribers`).
+
 ## [1.1.0]
 
 ### Añadido
