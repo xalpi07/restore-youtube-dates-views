@@ -40,9 +40,13 @@ function getDateRegex(locale, code) {
   const adverb = escapeRegExp(locale.dateAdverb).replace(/\s+/g, '\\s+');
   // The space between number and unit is optional: "hace 3 m" and "1mo ago".
   const unit = `(\\d+)\\s*(${tokens})\\.?`;
+  // Optional label before the date, e.g. "Transmitido hace 1 m" / "Streamed 1mo
+  // ago" / "Se estrenó hace 1 m". It must not contain digits, so it never grabs
+  // across another number. Groups: 1) prefix  2) number  3) unit token.
+  const prefix = '([^\\d]*?)';
   const body = locale.adverbPosition === 'after'
-    ? `${unit}\\s+${adverb}`
-    : `${adverb}\\s+${unit}`;
+    ? `${prefix}${unit}\\s+${adverb}`
+    : `${prefix}${adverb}\\s+${unit}`;
 
   const regex = new RegExp(`^\\s*${body}\\s*$`, 'i');
   _dateRegexCache.set(code, regex);
@@ -70,14 +74,16 @@ function transformDate(text, locale, code) {
   const match = getDateRegex(locale, code).exec(text);
   if (!match) return null;
 
-  const amount = Number.parseInt(match[1], 10);
-  const unit = locale.units[normalizeToken(match[2], locale)];
+  const prefix = match[1] || '';
+  const amount = Number.parseInt(match[2], 10);
+  const unit = locale.units[normalizeToken(match[3], locale)];
   if (!unit) return null;
 
   const word = amount === 1 ? unit.one : unit.other;
-  return locale.adverbPosition === 'after'
+  const core = locale.adverbPosition === 'after'
     ? `${amount} ${word} ${locale.dateAdverb}`
     : `${locale.dateAdverb} ${amount} ${word}`;
+  return prefix + core;
 }
 
 // Tokens may come in a different case; resolve them against the real keys of

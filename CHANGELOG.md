@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.11]
+
+### Fixed
+
+- Dates with a label prefix, used by stream recordings and premieres, are now
+  restored: `Transmitido hace 1 m` → `Transmitido hace 1 mes`,
+  `Streamed 1mo ago` → `Streamed 1 month ago`, `Se estrenó hace 2 d`, etc. The
+  prefix (which must not contain digits) is preserved.
+
 ## [1.1.10]
 
 ### Fixed
