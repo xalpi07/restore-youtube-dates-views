@@ -27,19 +27,6 @@
     effective = { ...settings, locale: resolveLocaleCode(settings.locale, uiLang) };
   }
 
-  // For ambiguous values (2K/4K/8K) or plain numbers, look at the text of up to
-  // 4 short ancestors: if they contain a date, the word "views" or the "•"/"·"
-  // separator, this is a video's metadata line, so the value is a view count
-  // (not a resolution / random number).
-  function inMetadataContext(node) {
-    let el = node.parentElement;
-    for (let i = 0; i < 4 && el; i++, el = el.parentElement) {
-      const text = el.textContent;
-      if (text && text.length < 60 && hasMetadataSignal(text)) return true;
-    }
-    return false;
-  }
-
   // Interactive widgets whose text we must never touch. Like/dislike counters
   // (including those injected by other extensions, e.g. Return YouTube Dislike)
   // live inside buttons; rewriting them causes an infinite update loop between
@@ -54,26 +41,23 @@
     return !!(el && el.closest(INTERACTIVE_SELECTOR));
   }
 
-  // Subscriber and video counts ("82.2 M subscribers", "1.8 K videos") use the
-  // same K/M/B format as views. If the node or a short ancestor mentions them,
-  // return the matching kind so we expand with the right wording.
-  function ancestorMatches(node, signalFn) {
+  // Single ancestor scan (at most a few short textContent reads): tells which
+  // count kind the surrounding metadata line implies, and whether it looks like
+  // metadata at all. Only used for lone numbers that need context.
+  function scanAncestors(node) {
     let el = node.parentElement;
-    for (let i = 0; i < 4 && el; i++, el = el.parentElement) {
+    let subscribers = false;
+    let videos = false;
+    let metadata = false;
+    for (let i = 0; i < 3 && el; i++, el = el.parentElement) {
       const text = el.textContent;
-      if (text && text.length < 80 && signalFn(text)) return true;
+      if (!text || text.length >= 80) continue;
+      if (!subscribers && hasSubscriberSignal(text)) subscribers = true;
+      if (!videos && hasVideoSignal(text)) videos = true;
+      if (!metadata && hasMetadataSignal(text)) metadata = true;
+      if (subscribers && metadata) break;
     }
-    return false;
-  }
-
-  function detectContextKind(node, value) {
-    if (hasSubscriberSignal(value) || ancestorMatches(node, hasSubscriberSignal)) {
-      return 'subscribers';
-    }
-    if (hasVideoSignal(value) || ancestorMatches(node, hasVideoSignal)) {
-      return 'videos';
-    }
-    return null;
+    return { subscribers, videos, metadata };
   }
 
   function processTextNode(node) {
@@ -82,17 +66,18 @@
     if (lastOutputs.get(node) === value) return;
     if (isInInteractiveElement(node)) return;
 
-    // Subscriber/video counts use the same K/M/B format as views but a
-    // different word. Detect the kind (from the node text or a short ancestor)
-    // so we expand with the right wording.
-    const contextKind = detectContextKind(node, value);
+    // Kind implied by the node's own text (cheap regex, no DOM walk).
+    let contextKind = hasSubscriberSignal(value) ? 'subscribers'
+      : hasVideoSignal(value) ? 'videos' : null;
+    let metadata = hasStrongMetadataSignal(value) || contextKind !== null;
 
-    // Mark the text as confirmed metadata when the node itself already contains
-    // a date/count word, or when the context confirms it. Only then do we
-    // convert ambiguous values (2K/4K/8K) and plain numbers.
-    const ambiguous = isAmbiguousResolutionText(value) || isPlainCountText(value);
-    const metadata =
-      hasStrongMetadataSignal(value) || contextKind !== null || (ambiguous && inMetadataContext(node));
+    // Only walk ancestors for a lone number/count that needs context to be
+    // classified. This keeps the common path free of expensive textContent reads.
+    if (!metadata && needsContext(value)) {
+      const ctx = scanAncestors(node);
+      contextKind = ctx.subscribers ? 'subscribers' : ctx.videos ? 'videos' : null;
+      metadata = ctx.metadata || contextKind !== null;
+    }
 
     const output = transformMetadataText(value, effective, metadata, contextKind);
     if (output === null || output === value) return;

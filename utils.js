@@ -151,16 +151,12 @@ function transformCount(text, locale, metadata = false, contextKind = null, enab
   return null;
 }
 
-// Is the text exactly an ambiguous value (2K/4K/8K) that could be either a
-// resolution or a view count?
-function isAmbiguousResolutionText(text) {
-  const m = /^\s*(\d+)\s*([KMB])\s*$/i.exec(text);
-  return !!m && RESOLUTION_BLOCKLIST.has(`${m[1]}${m[2].toUpperCase()}`);
-}
-
-// Is the text a plain 1-3 digit number (possible count below 1000)?
-function isPlainCountText(text) {
-  return /^\s*\d{1,3}\s*$/.test(text);
+// Does this text need surrounding context to be classified? True for a lone
+// number (possible count < 1000) or a lone scaled count ("353K", "82.2 M") with
+// no word of its own. Tolerates invisible formatting characters.
+function needsContext(text) {
+  const t = stripFormatting(text);
+  return /^\s*\d{1,3}\s*$/.test(t) || /^\s*\d+(?:[.,]\d+)?\s*[KMB]\s*$/.test(t);
 }
 
 // Date adverbs and view words in several languages: a "strong" signal that the
@@ -199,6 +195,10 @@ function hasVideoSignal(text) {
 const _separatorRegex = /(\s*[·•]\s*)/;
 
 function transformMetadataText(text, settings, metadata = false, contextKind = null) {
+  // Fast path: no separator means a single piece; skip the split/join.
+  if (text.indexOf('\u00b7') === -1 && text.indexOf('\u2022') === -1) {
+    return transformSegment(text, settings, metadata, contextKind);
+  }
   const parts = text.split(_separatorRegex);
   let changed = false;
   for (let i = 0; i < parts.length; i++) {

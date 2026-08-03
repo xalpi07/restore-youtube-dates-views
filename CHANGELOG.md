@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.13]
+
+### Performance
+
+- Ancestor context is now inspected in a single pass and only for lone numbers
+  that actually need it. Previously every number ran up to three separate
+  ancestor walks reading `textContent` (~8-12 reads per node); the common path
+  now does none.
+- `transformMetadataText` skips the split/join when there is no separator.
+
 ## [1.1.12]
 
 ### Documentation
