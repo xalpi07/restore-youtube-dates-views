@@ -132,6 +132,14 @@ function hasMetadataSignal(text) {
   return /[·•]/.test(text) || hasStrongMetadataSignal(text);
 }
 
+// Subscriber-count words across languages. Such counts ("82.2 M subscribers")
+// look like view counts, so we must NOT convert them.
+const _subscriberRegex = /(suscriptor|subscriber|inscrit|abonn|iscritt)/i;
+
+function hasSubscriberSignal(text) {
+  return _subscriberRegex.test(text);
+}
+
 // A single node may contain several pieces separated by • or ·, e.g.
 // "683K • 8mo ago". Split on the separator (keeping it) and transform each
 // piece independently. Returns the recomposed text, or null if nothing changed.

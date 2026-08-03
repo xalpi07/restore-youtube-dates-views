@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.6]
+
+### Fixed
+
+- Subscriber counts are no longer converted to view counts. A number next to a
+  "subscribers" word (in any supported language, e.g. `82.2 M de suscriptores`)
+  is now detected by context and left untouched, even when the number and the
+  word live in separate nodes.
+
 ## [1.1.5]
 
 ### Fixed
