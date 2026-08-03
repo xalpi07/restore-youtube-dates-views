@@ -1,38 +1,38 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Opciones · Restaurar fechas y vistas de YouTube</title>
+  <title>Options · Restore YouTube Dates &amp; Views</title>
   <link rel="icon" href="icons/icon-48.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="card">
     <header class="card__header">
-      <h1 class="card__title">Restaurar fechas y vistas de YouTube</h1>
+      <h1 class="card__title">Restore YouTube Dates &amp; Views</h1>
       <p class="card__subtitle">
-        Devuelve el formato largo a las fechas ("hace 3 meses") y a las vistas
-        ("13 mil vistas") que YouTube abrevió.
+        Brings back the long format for dates ("3 months ago") and view counts
+        ("13 thousand views") that YouTube shortened.
       </p>
     </header>
 
     <section class="options">
-      <!-- Restaurar fechas -->
+      <!-- Restore dates -->
       <label class="option">
         <input type="checkbox" id="restoreDates" />
         <span class="option__text">
-          <span class="option__label">Restaurar fechas completas</span>
-          <span class="option__hint">"hace 3 m" → "hace 3 meses"</span>
+          <span class="option__label">Restore full dates</span>
+          <span class="option__hint">"3 mo. ago" → "3 months ago"</span>
         </span>
       </label>
 
-      <!-- Restaurar vistas -->
+      <!-- Restore views -->
       <label class="option">
         <input type="checkbox" id="restoreViews" />
         <span class="option__text">
-          <span class="option__label">Restaurar texto de vistas</span>
-          <span class="option__hint">"13 K" → "13 mil vistas"</span>
+          <span class="option__label">Restore view counts</span>
+          <span class="option__hint">"13K" → "13 thousand views"</span>
         </span>
       </label>
 
@@ -40,19 +40,19 @@
       <label class="option">
         <input type="checkbox" id="debug" />
         <span class="option__text">
-          <span class="option__label">Mostrar logs en consola</span>
-          <span class="option__hint">Útil para depurar (DevTools).</span>
+          <span class="option__label">Show logs in the console</span>
+          <span class="option__hint">Useful for debugging (DevTools).</span>
         </span>
       </label>
 
-      <!-- Idioma -->
+      <!-- Language -->
       <label class="option option--select">
         <span class="option__text">
-          <span class="option__label">Idioma</span>
-          <span class="option__hint">Idioma de los textos restaurados.</span>
+          <span class="option__label">Language</span>
+          <span class="option__hint">Language of the restored text.</span>
         </span>
         <select id="locale" class="option__select">
-          <option value="auto">Automático (según YouTube)</option>
+          <option value="auto">Automatic (match YouTube)</option>
           <option value="es">Español</option>
           <option value="en">English</option>
           <option value="pt">Português</option>

@@ -1,5 +1,5 @@
-// Content script: un único MutationObserver (sin polling) que procesa solo los
-// nodos nuevos o modificados y reacciona a la navegación SPA de YouTube.
+// Content script: a single MutationObserver (no polling) that processes only
+// new or modified nodes and reacts to YouTube's SPA navigation.
 
 (() => {
   'use strict';
@@ -7,13 +7,13 @@
   const api = globalThis.browser ?? globalThis.chrome;
 
   let settings = { ...DEFAULT_SETTINGS };
-  // Opciones "efectivas": como `settings` pero con el idioma ya resuelto
-  // (la preferencia 'auto' se traduce al idioma real de la interfaz).
+  // "Effective" options: like `settings` but with the language already resolved
+  // (the 'auto' preference is translated to the real UI language).
   let effective = { ...DEFAULT_SETTINGS, locale: DEFAULT_LOCALE };
 
-  // Guarda la última salida escrita por nodo para no reprocesar y para romper
-  // el bucle que provocaría el observer al detectar nuestra propia escritura.
-  // WeakMap => los nodos eliminados se liberan (sin memory leaks).
+  // Stores the last output written per node, to avoid reprocessing and to break
+  // the loop the observer would trigger when detecting our own write.
+  // WeakMap => removed nodes are freed (no memory leaks).
   const lastOutputs = new WeakMap();
 
   let observer = null;
@@ -27,9 +27,10 @@
     effective = { ...settings, locale: resolveLocaleCode(settings.locale, uiLang) };
   }
 
-  // Para valores ambiguos (2K/4K/8K) mira el texto de hasta 4 ancestros cortos:
-  // si contienen una fecha, la palabra "vistas/views" o el separador "·", es la
-  // línea de metadatos de un vídeo, así que el valor son vistas (no resolución).
+  // For ambiguous values (2K/4K/8K) or plain numbers, look at the text of up to
+  // 4 short ancestors: if they contain a date, the word "views" or the "•"/"·"
+  // separator, this is a video's metadata line, so the value is a view count
+  // (not a resolution / random number).
   function inMetadataContext(node) {
     let el = node.parentElement;
     for (let i = 0; i < 4 && el; i++, el = el.parentElement) {
@@ -44,9 +45,9 @@
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
 
-    // Marca el texto como metadato confirmado cuando el propio nodo ya contiene
-    // una fecha o la palabra de vistas, o cuando el contexto lo confirma. Solo
-    // entonces se convierten valores ambiguos (2K/4K/8K) y números planos.
+    // Mark the text as confirmed metadata when the node itself already contains
+    // a date or the word "views", or when the context confirms it. Only then do
+    // we convert ambiguous values (2K/4K/8K) and plain numbers.
     const ambiguous = isAmbiguousResolutionText(value) || isPlainCountText(value);
     const metadata =
       hasStrongMetadataSignal(value) || (ambiguous && inMetadataContext(node));
@@ -54,12 +55,12 @@
     const output = transformMetadataText(value, effective, metadata);
     if (output === null || output === value) return;
 
-    node.nodeValue = output; // solo se modifica el texto visible, nunca el HTML
+    node.nodeValue = output; // only the visible text is changed, never the HTML
     lastOutputs.set(node, output);
-    log('Restaurado:', JSON.stringify(value), '->', JSON.stringify(output));
+    log('Restored:', JSON.stringify(value), '->', JSON.stringify(output));
   }
 
-  // Recorre solo el subárbol indicado (nunca el documento completo).
+  // Walk only the given subtree (never the whole document).
   function scanSubtree(root) {
     if (root.nodeType === Node.TEXT_NODE) {
       processTextNode(root);
@@ -102,7 +103,7 @@
   function registerSpaNavigation() {
     for (const eventName of YT_NAVIGATION_EVENTS) {
       document.addEventListener(eventName, () => {
-        recomputeEffective(); // el idioma de la UI podría haber cambiado
+        recomputeEffective(); // the UI language might have changed
         queueMicrotask(fullScan);
       }, { passive: true });
     }
@@ -113,7 +114,7 @@
       const stored = await api.storage.sync.get(DEFAULT_SETTINGS);
       settings = { ...DEFAULT_SETTINGS, ...stored };
     } catch (err) {
-      console.warn(LOG_PREFIX, 'No se pudieron leer las opciones:', err);
+      console.warn(LOG_PREFIX, 'Could not read the options:', err);
     }
     recomputeEffective();
     fullScan();

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Empaqueta la extensión en dist/ para subir a las tiendas.
-El manifest.json queda en la raíz del ZIP (requisito de Chrome y Firefox).
-Uso: python tools/package.py"""
+"""Package the extension into dist/ for the stores.
+The manifest.json stays at the root of the ZIP (required by Chrome and Firefox).
+Usage: python tools/package.py"""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 
-# Solo archivos de ejecución (nada de docs, tooling ni config de dev).
+# Runtime files only (no docs, tooling or dev config).
 FILES = [
     "manifest.json",
     "constants.js",
@@ -34,17 +34,17 @@ def main() -> None:
         version = json.load(fh)["version"]
 
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, f"yt-restaurar-fechas-v{version}.zip")
+    out = os.path.join(DIST, f"restore-youtube-dates-views-v{version}.zip")
 
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for rel in FILES:
             src = os.path.join(ROOT, rel)
             if not os.path.exists(src):
-                raise SystemExit(f"Falta el archivo: {rel}")
-            zf.write(src, rel)  # rel conserva la ruta relativa (icons/...)
+                raise SystemExit(f"Missing file: {rel}")
+            zf.write(src, rel)  # rel keeps the relative path (icons/...)
 
     size_kb = os.path.getsize(out) / 1024
-    print(f"Generado {out} ({size_kb:.1f} KB, {len(FILES)} archivos)")
+    print(f"Generated {out} ({size_kb:.1f} KB, {len(FILES)} files)")
 
 
 if __name__ == "__main__":

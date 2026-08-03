@@ -1,4 +1,4 @@
-// Página de opciones: refleja el estado guardado y persiste cada cambio.
+// Options page: reflects the saved state and persists every change.
 
 (() => {
   'use strict';
@@ -26,7 +26,7 @@
 
   async function saveOption(key, value) {
     await api.storage.sync.set({ [key]: value });
-    showStatus('Guardado ✓');
+    showStatus('Saved ✓');
   }
 
   function bindEvents() {

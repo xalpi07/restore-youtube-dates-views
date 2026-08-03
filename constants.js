@@ -1,25 +1,26 @@
-// Datos declarativos: opciones por defecto e i18n.
-// Los archivos del content_script comparten ámbito, así que estas constantes
-// quedan disponibles en utils.js y content.js sin imports.
+// Declarative data: default options and i18n.
+// Files in the same content_script share scope, so these constants are
+// available in utils.js and content.js without imports.
 
 const DEFAULT_SETTINGS = Object.freeze({
   restoreDates: true,
   restoreViews: true,
   debug: false,
-  locale: 'auto', // 'auto' detecta el idioma de la interfaz de YouTube
+  locale: 'auto', // 'auto' detects the language of YouTube's interface
 });
 
 const DEFAULT_LOCALE = 'es';
 
-// Cada idioma define:
-//   dateAdverb      → adverbio de la fecha relativa ("hace", "ago"...).
-//   adverbPosition  → 'before' ("hace 3 meses") o 'after' ("3 months ago").
-//   units           → token abreviado → { one, other } (singular / plural).
-//   views           → sufijo K/M/B → { one, other } con {n} = número original.
+// Each language defines:
+//   dateAdverb      → relative-date adverb ("hace", "ago"...).
+//   adverbPosition  → 'before' ("hace 3 meses") or 'after' ("3 months ago").
+//   units           → abbreviated token → { one, other } (singular / plural).
+//   views           → K/M/B suffix → { one, other } where {n} is the number.
+//   count           → { one, other } for plain counts below 1000 ("632 views").
 //
-// utils.js ordena los tokens de `units` por longitud, por lo que "min"/"sem"
-// tienen prioridad sobre "m"/"s". Los mapeos no españoles son de mejor esfuerzo
-// y solo se aplican si el texto coincide EXACTAMENTE, por lo que son inocuos.
+// utils.js sorts the `units` tokens by length, so "min"/"sem" take priority
+// over "m"/"s". The non-Spanish mappings are best-effort and only apply when
+// the text matches EXACTLY, so they are harmless.
 const LOCALES = Object.freeze({
   es: {
     dateAdverb: 'hace',
@@ -142,10 +143,10 @@ const LOCALES = Object.freeze({
   },
 });
 
-// Eventos de navegación SPA de YouTube.
+// YouTube SPA navigation events.
 const YT_NAVIGATION_EVENTS = Object.freeze([
   'yt-navigate-finish',
   'yt-page-data-updated',
 ]);
 
-const LOG_PREFIX = '[YT-Restaurar]';
+const LOG_PREFIX = '[YT-Restore]';

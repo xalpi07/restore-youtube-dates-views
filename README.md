@@ -1,152 +1,154 @@
 <div align="center">
 
-# Restaurar fechas y vistas de YouTube
+# Restore YouTube Dates &amp; Views
 
-Extensión de navegador que devuelve el **formato largo** a las fechas y vistas
-que YouTube abrevió en su interfaz.
+A browser extension that brings back the **long format** for the dates and view
+counts that YouTube shortened in its interface.
 
 ![Manifest V3](https://img.shields.io/badge/manifest-v3-blue)
-![Navegadores](https://img.shields.io/badge/Chrome%20·%20Brave%20·%20Edge%20·%20Firefox-informational)
-![Idiomas](https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20PT%20·%20FR%20·%20IT%20·%20DE-success)
-![Licencia](https://img.shields.io/badge/licencia-MIT-green)
+![Browsers](https://img.shields.io/badge/Chrome%20·%20Brave%20·%20Edge%20·%20Firefox-informational)
+![Languages](https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20PT%20·%20FR%20·%20IT%20·%20DE-success)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
 
 ---
 
-## ¿Qué hace?
+## What it does
 
-YouTube empezó a mostrar fechas y vistas abreviadas. Esta extensión las
-restaura automáticamente mientras navegas:
+YouTube started showing abbreviated dates and view counts. This extension
+restores them automatically as you browse:
 
-| YouTube muestra | La extensión restaura      |
-| --------------- | -------------------------- |
-| `hace 3 m`      | `hace 3 meses`             |
-| `hace 1 a`      | `hace 1 año`               |
-| `hace 8 d`      | `hace 8 días`              |
-| `hace 3 sem`    | `hace 3 semanas`           |
-| `13 K`          | `13 mil vistas`            |
-| `1 M`           | `1 millón de vistas`       |
-| `3,5 M`         | `3,5 millones de vistas`   |
-| `1 B`           | `1 mil millones de vistas` |
+| YouTube shows  | The extension restores    |
+| -------------- | ------------------------- |
+| `3 m` / `3mo`  | `3 months ago`            |
+| `1 a` / `1y`   | `1 year ago`              |
+| `8 d` / `8d`   | `8 days ago`              |
+| `3 sem` / `3w` | `3 weeks ago`             |
+| `13K`          | `13 thousand views`       |
+| `1M`           | `1 million views`         |
+| `632`          | `632 views`               |
+| `1B`           | `1 billion views`         |
 
-Funciona en toda la plataforma: inicio, búsqueda, canal, suscripciones,
-tendencias, historial, página de reproducción, Shorts, etc.
+It works across the whole platform: home, search, channel, subscriptions,
+trending, history, watch page, Shorts, etc.
+
+> The default output language matches YouTube's interface. Examples above use
+> English; in Spanish it produces `hace 3 meses`, `13 mil vistas`, and so on.
 
 ---
 
-## Características
+## Features
 
-- **Basada en el texto, no en clases CSS.** El reconocimiento se hace con
-  expresiones regulares sobre el contenido, así que sobrevive a los cambios de
-  HTML de YouTube.
-- **Solo modifica el texto visible** (`Text.nodeValue`); nunca altera el HTML,
-  por lo que no rompe la página.
-- **Sin polling.** Un único `MutationObserver` procesa únicamente los nodos
-  nuevos o modificados.
-- **Sin fugas de memoria.** Usa `WeakMap` para marcar lo ya procesado; los
-  nodos eliminados se liberan solos.
-- **Compatible con SPA.** Reacciona a la navegación interna de YouTube.
-- **Multi-idioma.** Español, inglés, portugués, francés, italiano y alemán, con
-  detección automática del idioma de la interfaz.
-- **Multi-navegador.** Chrome, Brave, Edge y Firefox con el mismo código
+- **Text-based, not CSS-class based.** Recognition uses regular expressions on
+  the content, so it survives YouTube's HTML changes.
+- **Only changes the visible text** (`Text.nodeValue`); it never alters the
+  HTML, so it can't break the page.
+- **No polling.** A single `MutationObserver` processes only new or modified
+  nodes.
+- **No memory leaks.** Uses a `WeakMap` to mark processed nodes; removed nodes
+  are freed automatically.
+- **SPA-aware.** Reacts to YouTube's internal navigation.
+- **Multi-language.** Spanish, English, Portuguese, French, Italian and German,
+  with automatic detection of the interface language.
+- **Cross-browser.** Chrome, Brave, Edge and Firefox from the same code
   (Manifest V3).
-- **Sin dependencias.** JavaScript puro.
+- **No dependencies.** Plain JavaScript.
 
 ---
 
-## Instalación
+## Installation
 
-> La extensión aún no está en las tiendas; se instala en modo desarrollador.
+> The extension is not on the stores yet; it is loaded in developer mode.
 
 ### Chrome · Brave · Edge
 
-1. Descarga o clona este repositorio.
-2. Abre `chrome://extensions` (en Edge, `edge://extensions`).
-3. Activa el **Modo desarrollador**.
-4. Pulsa **Cargar descomprimida** y selecciona la carpeta del proyecto.
-5. Abre YouTube y recarga.
+1. Download or clone this repository.
+2. Open `chrome://extensions` (on Edge, `edge://extensions`).
+3. Enable **Developer mode**.
+4. Click **Load unpacked** and select the project folder.
+5. Open YouTube and reload.
 
 ### Firefox
 
-1. Abre `about:debugging#/runtime/this-firefox`.
-2. Pulsa **Cargar complemento temporal…**.
-3. Selecciona el archivo `manifest.json`.
-4. Abre YouTube y recarga.
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…**.
+3. Select the `manifest.json` file.
+4. Open YouTube and reload.
 
 ---
 
-## Configuración
+## Configuration
 
-Abre la página de opciones de la extensión para ajustar:
+Open the extension's options page to adjust:
 
-- ☑ **Restaurar fechas completas** — `hace 3 m` → `hace 3 meses`.
-- ☑ **Restaurar texto de vistas** — `13 K` → `13 mil vistas`.
-- ☑ **Mostrar logs en consola** — útil para depurar (DevTools).
-- **Idioma** — Automático (según YouTube) o uno fijo.
+- ☑ **Restore full dates** — `3 mo. ago` → `3 months ago`.
+- ☑ **Restore view counts** — `13K` → `13 thousand views`.
+- ☑ **Show logs in the console** — useful for debugging (DevTools).
+- **Language** — Automatic (match YouTube) or a fixed one.
 
-Los cambios se aplican al instante, sin recargar YouTube.
-
----
-
-## Idiomas soportados
-
-| Idioma     | Adverbio  | Ejemplo                       |
-| ---------- | --------- | ----------------------------- |
-| Español    | `hace`    | `hace 3 meses`                |
-| English    | `ago`     | `3 months ago`                |
-| Português  | `há`      | `há 3 meses`                  |
-| Français   | `il y a`  | `il y a 3 mois`               |
-| Italiano   | `fa`      | `3 mesi fa`                   |
-| Deutsch    | `vor`     | `vor 3 Monaten`               |
-
-Añadir un idioma es tan simple como agregar una entrada en `LOCALES`
-(`constants.js`): adverbio, posición, unidades y plantillas de vistas. No hace
-falta tocar la lógica.
+Changes apply instantly, without reloading YouTube.
 
 ---
 
-## Estructura del proyecto
+## Supported languages
+
+| Language   | Adverb   | Example         |
+| ---------- | -------- | --------------- |
+| Español    | `hace`   | `hace 3 meses`  |
+| English    | `ago`    | `3 months ago`  |
+| Português  | `há`     | `há 3 meses`    |
+| Français   | `il y a` | `il y a 3 mois` |
+| Italiano   | `fa`     | `3 mesi fa`     |
+| Deutsch    | `vor`    | `vor 3 Monaten` |
+
+Adding a language is as simple as adding an entry to `LOCALES`
+(`constants.js`): adverb, position, units and view templates. No logic changes
+required.
+
+---
+
+## Project structure
 
 ```
 .
-├── manifest.json        # Manifest V3 (+ ajustes de Firefox)
-├── constants.js         # Opciones por defecto e i18n (LOCALES)
-├── utils.js             # Transformaciones puras (regex por texto)
-├── content.js           # MutationObserver + navegación SPA + storage
-├── options.html/js      # Página de opciones
-├── style.css            # Estilos de las opciones
-├── icons/               # Iconos 16/32/48/128
+├── manifest.json        # Manifest V3 (+ Firefox settings)
+├── constants.js         # Default options and i18n (LOCALES)
+├── utils.js             # Pure transformations (text-based regex)
+├── content.js           # MutationObserver + SPA navigation + storage
+├── options.html/js      # Options page
+├── style.css            # Options styles
+├── icons/               # 16/32/48/128 icons
 └── tools/
-    ├── make_icons.py    # Regenera los iconos
-    └── package.py       # Empaqueta la extensión en dist/
+    ├── make_icons.py    # Regenerates the icons
+    └── package.py       # Packages the extension into dist/
 ```
 
-### Cómo funciona (resumen)
+### How it works (summary)
 
 ```
-YouTube DOM ─▶ MutationObserver ─▶ solo nodos nuevos ─▶ processTextNode
-                                                              │
-                                                transformText (regex, i18n)
-                                                              │
-                                                Text.nodeValue = "…"  (solo texto)
+YouTube DOM ─▶ MutationObserver ─▶ new nodes only ─▶ processTextNode
+                                                          │
+                                              transformText (regex, i18n)
+                                                          │
+                                              Text.nodeValue = "…"  (text only)
 ```
 
-Un `WeakMap<Text, string>` recuerda la última salida por nodo para no
-reprocesar y para evitar el bucle que provocaría el propio observer al detectar
-la escritura.
+A `WeakMap<Text, string>` remembers the last output per node to avoid
+reprocessing and to break the loop the observer would otherwise trigger when
+detecting the write.
 
 ---
 
-## Empaquetado
+## Packaging
 
-Genera un ZIP con solo los archivos de ejecución (manifest en la raíz):
+Build a ZIP with only the runtime files (manifest at the root):
 
 ```bash
-python tools/package.py     # → dist/yt-restaurar-fechas-v<versión>.zip
+python tools/package.py     # → dist/restore-youtube-dates-views-v<version>.zip
 ```
 
-Para regenerar los iconos (requiere Pillow):
+To regenerate the icons (requires Pillow):
 
 ```bash
 python tools/make_icons.py
@@ -154,16 +156,16 @@ python tools/make_icons.py
 
 ---
 
-## Contribuir
+## Contributing
 
-1. Haz un fork y crea una rama.
-2. Mantén el estilo: JavaScript moderno, funciones pequeñas y sin dependencias.
-3. Verifica la lógica de `utils.js` (son funciones puras, fáciles de probar).
-4. Abre un Pull Request describiendo el cambio.
+1. Fork the repo and create a branch.
+2. Keep the style: modern JavaScript, small functions, no dependencies.
+3. Verify the `utils.js` logic (pure functions, easy to test).
+4. Open a Pull Request describing the change.
 
 ---
 
-## Licencia
+## License
 
-Distribuido bajo licencia [MIT](LICENSE). El historial de versiones está en
+Released under the [MIT](LICENSE) license. The version history is in
 [CHANGELOG.md](CHANGELOG.md).

@@ -1,19 +1,19 @@
-# Paquetes generados
+# Generated packages
 *.zip
 *.xpi
 *.crx
 *.pem
 web-ext-artifacts/
 
-# Dependencias (por si en el futuro se añade tooling)
+# Dependencies (in case tooling is added later)
 node_modules/
 
-# Sistema operativo
+# Operating system
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Editores / IDE
+# Editors / IDE
 .vscode/
 .idea/
 *.swp

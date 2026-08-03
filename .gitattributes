@@ -1,7 +1,7 @@
-# Normaliza los finales de línea a LF en el repositorio
+# Normalize line endings to LF in the repository
 * text=auto eol=lf
 
-# Archivos binarios (no tocar)
+# Binary files (leave untouched)
 *.png binary
 *.jpg binary
 *.zip binary

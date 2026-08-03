@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Genera los iconos PNG (16/32/48/128) con Pillow: cuadrado rojo y reloj.
-Uso: python tools/make_icons.py"""
+"""Generate the PNG icons (16/32/48/128) with Pillow: red square and a clock.
+Usage: python tools/make_icons.py"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "icons")
 RED = (204, 0, 0, 255)
 WHITE = (255, 255, 255, 255)
 SIZES = (16, 32, 48, 128)
-SCALE = 8  # supermuestreo para bordes suaves
+SCALE = 8  # supersampling for smooth edges
 
 
 def make_icon(size: int) -> Image.Image:
@@ -45,7 +45,7 @@ def main() -> None:
         icon = make_icon(size)
         path = os.path.join(OUT_DIR, f"icon-{size}.png")
         icon.save(path, "PNG")
-        print(f"generado {path}")
+        print(f"generated {path}")
 
 
 if __name__ == "__main__":

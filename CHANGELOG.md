@@ -1,69 +1,67 @@
 # Changelog
 
-Todas las novedades relevantes de este proyecto se documentan en este archivo.
+All notable changes to this project are documented in this file.
 
-El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
-y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [1.1.4]
 
-### Añadido
+### Added
 
-- Contadores planos de menos de mil vistas (p. ej. `632` → `632 vistas`,
-  `1` → `1 vista`). Solo se convierten cuando el contexto confirma que son
-  metadatos de vídeo (hay una fecha o la palabra de vistas al lado), de modo
-  que no se tocan años, resoluciones ni números sueltos.
+- Plain counts below one thousand views (e.g. `632` → `632 views`,
+  `1` → `1 view`). They are only converted when the context confirms they are
+  video metadata (a date or the word "views" is next to them), so years,
+  resolutions and stray numbers are left untouched.
 
 ## [1.1.3]
 
-### Corregido
+### Fixed
 
-- Metadatos combinados en un solo nodo de texto (p. ej. las *watch cards* de
-  búsqueda: `FromSoftware, Inc. • 683K • 8mo ago`). Ahora el texto se divide por
-  el separador (• o ·) y se transforma cada pieza por separado.
-- Se reconoce también el separador • (bullet), no solo · (middot).
+- Combined metadata in a single text node (e.g. search "watch cards":
+  `FromSoftware, Inc. • 683K • 8mo ago`). The text is now split by the
+  separator (• or ·) and each piece is transformed independently.
+- The • (bullet) separator is now recognized as well, not only · (middot).
 
 ## [1.1.2]
 
-### Corregido
+### Fixed
 
-- Valores ambiguos `2K`/`4K`/`8K` que en realidad son vistas ahora se
-  restauran cuando aparecen en la línea de metadatos de un vídeo (junto a una
-  fecha, la palabra "vistas/views" o el separador ·). En el menú de calidad del
-  reproductor se siguen dejando intactos como resolución.
+- Ambiguous values `2K`/`4K`/`8K` that are actually view counts are now
+  restored when they appear in a video's metadata line (next to a date, the
+  word "views" or the · separator). In the player quality menu they are still
+  left untouched as a resolution.
 
 ## [1.1.1]
 
-### Corregido
+### Fixed
 
-- Formatos sin espacios (interfaz en inglés y otras): `1mo ago` → `1 month ago`
-  y `128K` → `128 thousand views`. El espacio entre número y unidad/sufijo
-  ahora es opcional.
-- Se sigue protegiendo `2K`/`4K`/`8K` (resoluciones de vídeo) y textos que no
-  son vistas (p. ej. `5M subscribers`).
+- Space-less formats (English UI and others): `1mo ago` → `1 month ago` and
+  `128K` → `128 thousand views`. The space between number and unit/suffix is
+  now optional.
+- Still protects `2K`/`4K`/`8K` (video resolutions) and non-view text
+  (e.g. `5M subscribers`).
 
 ## [1.1.0]
 
-### Añadido
+### Added
 
-- Soporte de semanas en español: `hace 3 sem` → `hace 3 semanas` (también
-  admite el punto: `hace 3 sem.`).
-- Motor multi-idioma real: español, inglés, portugués, francés, italiano y
-  alemán, con adverbio antes o después de la fecha según el idioma.
-- Detección automática del idioma de la interfaz de YouTube y selector de
-  idioma en la página de opciones (opción "Automático").
+- Weeks support: `3 sem` → `3 semanas` (also accepts the dot: `3 sem.`).
+- Real multi-language engine: Spanish, English, Portuguese, French, Italian and
+  German, with the adverb before or after the date depending on the language.
+- Automatic detection of YouTube's UI language and a language selector on the
+  options page ("Automatic").
 
 ## [1.0.0]
 
-### Añadido
+### Added
 
-- Restauración de fechas relativas abreviadas: `hace 3 m` → `hace 3 meses`,
-  `hace 1 a` → `hace 1 año`, `hace 8 d` → `hace 8 días` (también `s`, `min`,
-  `h`, `sem`).
-- Restauración de contadores de vistas: `13 K` → `13 mil vistas`,
-  `1 M` → `1 millón de vistas`, `1 B` → `1 mil millones de vistas`.
-- Página de opciones para activar/desactivar fechas, vistas y logs.
-- `MutationObserver` único, sin polling, con procesamiento solo de nodos nuevos.
-- Soporte de navegación SPA de YouTube.
-- Compatibilidad con Chrome, Brave, Edge y Firefox (Manifest V3).
-- Arquitectura i18n preparada para más idiomas.
+- Restores abbreviated relative dates: `3 m` → `3 meses`, `1 a` → `1 año`,
+  `8 d` → `8 días`.
+- Restores view counts: `13K` → `13 thousand views`, `1M` → `1 million views`,
+  `1B` → `1 billion views`.
+- Options page to toggle dates, views and logs.
+- A single, no-polling `MutationObserver` that only processes new nodes.
+- YouTube SPA navigation support.
+- Compatible with Chrome, Brave, Edge and Firefox (Manifest V3).
+- i18n architecture ready for more languages.

@@ -1,6 +1,6 @@
-// Funciones puras de transformación. El reconocimiento se basa en el texto
-// (regex), nunca en clases CSS. Cada función devuelve la cadena transformada
-// o null si el texto no coincide con el patrón.
+// Pure text-transformation helpers. Recognition is based on the text (regex),
+// never on CSS classes. Each function returns the transformed string, or null
+// when the text does not match the pattern.
 
 function getLocale(code = DEFAULT_LOCALE) {
   return LOCALES[code] ?? LOCALES[DEFAULT_LOCALE];
@@ -9,18 +9,18 @@ function getLocale(code = DEFAULT_LOCALE) {
 const _dateRegexCache = new Map();
 let _viewsRegex = null;
 
-// Valores que en realidad son resoluciones de vídeo, no contadores de vistas.
-// Solo se bloquean cuando aparecen "desnudos" (sin espacio ni la palabra
-// "vistas/views"), p. ej. el menú de calidad muestra "4K".
+// Values that are actually video resolutions, not view counts. They are only
+// blocked when they appear "bare" (no space and no "views" word), e.g. the
+// quality menu shows "4K".
 const RESOLUTION_BLOCKLIST = new Set(['2K', '4K', '8K']);
 
 function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Fecha relativa, anclada para que el nodo sea EXACTAMENTE una fecha.
-// Admite punto tras la abreviatura ("sem." → semanas) y el adverbio antes
-// ("hace 3 sem") o después ("3 weeks ago"), según el idioma.
+// Relative date, anchored so the node is EXACTLY a date. Allows a trailing dot
+// after the abbreviation ("sem." → weeks) and the adverb before the value
+// ("hace 3 sem") or after it ("3 weeks ago"), depending on the language.
 function getDateRegex(locale, code) {
   const cached = _dateRegexCache.get(code);
   if (cached) return cached;
@@ -29,7 +29,7 @@ function getDateRegex(locale, code) {
     .sort((a, b) => b.length - a.length)
     .join('|');
   const adverb = escapeRegExp(locale.dateAdverb).replace(/\s+/g, '\\s+');
-  // El espacio entre número y unidad es opcional: "hace 3 m" y "1mo ago".
+  // The space between number and unit is optional: "hace 3 m" and "1mo ago".
   const unit = `(\\d+)\\s*(${tokens})\\.?`;
   const body = locale.adverbPosition === 'after'
     ? `${unit}\\s+${adverb}`
@@ -40,9 +40,9 @@ function getDateRegex(locale, code) {
   return regex;
 }
 
-// Grupos: 1) número  2) espacio (opcional)  3) sufijo K/M/B  4) palabra de
-// vistas (opcional, multi-idioma). El decimal admite coma o punto. Si detrás
-// del sufijo hay una palabra desconocida (p. ej. "subscribers"), no coincide.
+// Groups: 1) number  2) space (optional)  3) K/M/B suffix  4) views word
+// (optional, multilingual). The decimal accepts a comma or a dot. If an unknown
+// word follows the suffix (e.g. "subscribers"), it does not match.
 function getViewsRegex() {
   if (_viewsRegex) return _viewsRegex;
   const words = 'vistas?|reproducciones?|views?|vues?|aufrufe|visualiza\\p{L}+';
@@ -67,8 +67,8 @@ function transformDate(text, locale, code) {
     : `${locale.dateAdverb} ${amount} ${word}`;
 }
 
-// Los tokens pueden venir en distinta capitalización; resolvemos contra las
-// claves reales de `units` (p. ej. "SEK" → "Sek").
+// Tokens may come in a different case; resolve them against the real keys of
+// `units` (e.g. "SEK" → "Sek").
 function normalizeToken(raw, locale) {
   const lower = raw.toLowerCase();
   for (const key of Object.keys(locale.units)) {
@@ -77,15 +77,15 @@ function normalizeToken(raw, locale) {
   return lower;
 }
 
-// `metadata` indica que el contexto confirma que es la línea de metadatos de un
-// vídeo; solo entonces se convierten valores ambiguos (2K/4K/8K) y números
-// planos (< 1000 vistas, p. ej. "632").
+// `metadata` means the context confirms this is a video's metadata line; only
+// then do we convert ambiguous values (2K/4K/8K) and plain numbers (below
+// 1000 views, e.g. "632").
 function transformViews(text, locale, metadata = false) {
   const match = getViewsRegex().exec(text);
   if (match) {
     const number = match[1];
     const suffix = match[3].toUpperCase();
-    const bare = match[2] === '' && !match[4]; // sin espacio ni palabra
+    const bare = match[2] === '' && !match[4]; // no space and no word
     if (!metadata && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
       return null;
     }
@@ -94,7 +94,7 @@ function transformViews(text, locale, metadata = false) {
     return (number === '1' ? cfg.one : cfg.other).replace('{n}', number);
   }
 
-  // Número plano (1-3 dígitos): solo si el contexto confirma que son vistas.
+  // Plain number (1-3 digits): only when the context confirms it is a count.
   if (metadata && locale.count) {
     const plain = /^\s*(\d{1,3})\s*$/.exec(text);
     if (plain) {
@@ -105,20 +105,20 @@ function transformViews(text, locale, metadata = false) {
   return null;
 }
 
-// ¿El texto es exactamente un valor ambiguo (2K/4K/8K) que puede ser tanto
-// resolución como contador de vistas?
+// Is the text exactly an ambiguous value (2K/4K/8K) that could be either a
+// resolution or a view count?
 function isAmbiguousResolutionText(text) {
   const m = /^\s*(\d+)\s*([KMB])\s*$/i.exec(text);
   return !!m && RESOLUTION_BLOCKLIST.has(`${m[1]}${m[2].toUpperCase()}`);
 }
 
-// ¿El texto es un número plano de 1-3 dígitos (posible contador < 1000)?
+// Is the text a plain 1-3 digit number (possible count below 1000)?
 function isPlainCountText(text) {
   return /^\s*\d{1,3}\s*$/.test(text);
 }
 
-// Adverbios de fecha y palabras de vistas en varios idiomas: señal "fuerte"
-// de que el texto es la línea de metadatos de un vídeo.
+// Date adverbs and view words in several languages: a "strong" signal that the
+// text is a video's metadata line.
 const _strongSignalRegex =
   /(\bhace\b|\bago\b|\bh[áa]\b|il y a|\bfa\b|\bvor\b|vistas?|views?|vues?|aufrufe|reproducciones?|visualiza\p{L}+)/iu;
 
@@ -126,16 +126,15 @@ function hasStrongMetadataSignal(text) {
   return _strongSignalRegex.test(text);
 }
 
-// Igual que la anterior, pero admitiendo también los separadores · y •; se usa
-// para inspeccionar el texto de los ancestros de un nodo.
+// Same as above, but also accepting the · and • separators; used to inspect the
+// text of a node's ancestors.
 function hasMetadataSignal(text) {
   return /[·•]/.test(text) || hasStrongMetadataSignal(text);
 }
 
-// Un mismo nodo puede contener varias piezas separadas por • o ·, p. ej.
-// "683K • 8mo ago". Dividimos por el separador (conservándolo) y transformamos
-// cada segmento por separado. Devuelve el texto recompuesto o null si nada
-// cambió.
+// A single node may contain several pieces separated by • or ·, e.g.
+// "683K • 8mo ago". Split on the separator (keeping it) and transform each
+// piece independently. Returns the recomposed text, or null if nothing changed.
 const _separatorRegex = /(\s*[·•]\s*)/;
 
 function transformMetadataText(text, settings, allowResolution = false) {
@@ -153,8 +152,8 @@ function transformMetadataText(text, settings, allowResolution = false) {
   return changed ? parts.join('') : null;
 }
 
-// Transforma una única pieza (fecha o vistas). `allowResolution` permite
-// convertir 2K/4K/8K como vistas cuando el contexto confirma que son metadatos.
+// Transform a single piece (date or views). `allowResolution` allows converting
+// 2K/4K/8K as views when the context confirms it is metadata.
 function transformSegment(text, settings, allowResolution = false) {
   const code = settings.locale ?? DEFAULT_LOCALE;
   const locale = getLocale(code);
@@ -174,15 +173,15 @@ function transformText(text, settings) {
   return transformSegment(text, settings, false);
 }
 
-// Pre-filtro barato: sin dígitos no hay nada que transformar. El límite de
-// longitud descarta descripciones/párrafos, pero deja pasar líneas de metadatos
-// combinadas ("Canal • 683K • 8mo ago").
+// Cheap pre-filter: no digits, nothing to transform. The length cap discards
+// descriptions/paragraphs but still lets combined metadata lines through
+// ("Channel • 683K • 8mo ago").
 function isCandidateText(text) {
   return text.length > 0 && text.length < 100 && /\d/.test(text);
 }
 
-// Resuelve el código de idioma efectivo: 'auto' usa el idioma de la UI de
-// YouTube (atributo lang del <html>), con respaldo al idioma por defecto.
+// Resolve the effective language code: 'auto' uses YouTube's UI language (the
+// <html> lang attribute), falling back to the default language.
 function resolveLocaleCode(preference, uiLang) {
   if (preference && preference !== 'auto') {
     return LOCALES[preference] ? preference : DEFAULT_LOCALE;
