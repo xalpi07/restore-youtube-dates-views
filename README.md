@@ -130,16 +130,16 @@ YouTube DOM ──▶ MutationObserver ──▶ scanSubtree ──▶ processTe
 
 ## Empaquetado
 
-No hay build ni dependencias: es JavaScript plano. Empaquetar = comprimir los
-archivos (sin carpeta contenedora, el `manifest.json` debe quedar en la raíz del
-ZIP).
+No hay build ni dependencias: es JavaScript plano. Un script incluye solo los
+archivos de ejecución y deja el `manifest.json` en la raíz del ZIP (requisito de
+Chrome y Firefox):
 
 ```bash
-# Desde dentro de la carpeta del proyecto
-zip -r ../yt-restaurar-fechas.zip . -x "*.git*" "*.DS_Store"
+python tools/package.py
+# genera dist/yt-restaurar-fechas-v<versión>.zip
 ```
 
-El mismo ZIP sirve para Chrome Web Store y para AMO.
+El mismo ZIP sirve para Chrome Web Store y para Firefox Add-ons (AMO).
 
 ---
 
