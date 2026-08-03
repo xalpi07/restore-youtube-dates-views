@@ -88,6 +88,7 @@ Open the extension's options page to adjust:
 
 - ☑ **Restore full dates** — `3 mo. ago` → `3 months ago`.
 - ☑ **Restore view counts** — `13K` → `13 thousand views`.
+- ☑ **Restore subscriber counts** — `35.5K subscribers` → `35.5 thousand subscribers`.
 - ☑ **Show logs in the console** — useful for debugging (DevTools).
 - **Language** — Automatic (match YouTube) or a fixed one.
 

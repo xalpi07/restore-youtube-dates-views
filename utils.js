@@ -84,7 +84,10 @@ function normalizeToken(raw, locale) {
 // is a video's metadata line (needed to convert ambiguous 2K/4K/8K and plain
 // numbers). `subscriber` forces the subscriber vocabulary for bare numbers that
 // the context identified as a subscriber count.
-function transformCount(text, locale, metadata = false, subscriber = false) {
+function transformCount(text, locale, metadata = false, subscriber = false, enable = {}) {
+  const wantViews = enable.views !== false;
+  const wantSubs = enable.subscribers !== false;
+
   const match = getViewsRegex().exec(text);
   if (match) {
     const number = match[1];
@@ -94,6 +97,7 @@ function transformCount(text, locale, metadata = false, subscriber = false) {
 
     // Decide vocabulary: an explicit word wins; otherwise use the context.
     const isSub = word ? hasSubscriberSignal(word) : subscriber;
+    if (isSub ? !wantSubs : !wantViews) return null;
     if (!isSub && !metadata && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
       return null;
     }
@@ -104,7 +108,7 @@ function transformCount(text, locale, metadata = false, subscriber = false) {
   }
 
   // Plain number (1-3 digits): only when the context confirms it is a count.
-  if (metadata || subscriber) {
+  if ((subscriber && wantSubs) || (metadata && wantViews)) {
     const plain = /^\s*(\d{1,3})\s*$/.exec(text);
     if (plain) {
       const table = subscriber ? locale.subscribersCount : locale.count;
@@ -181,8 +185,9 @@ function transformSegment(text, settings, metadata = false, subscriber = false) 
     const date = transformDate(text, locale, code);
     if (date !== null) return date;
   }
-  if (settings.restoreViews) {
-    const count = transformCount(text, locale, metadata, subscriber);
+  if (settings.restoreViews || settings.restoreSubscribers) {
+    const enable = { views: settings.restoreViews, subscribers: settings.restoreSubscribers };
+    const count = transformCount(text, locale, metadata, subscriber, enable);
     if (count !== null) return count;
   }
   return null;

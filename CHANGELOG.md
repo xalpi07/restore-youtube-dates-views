@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.8]
+
+### Added
+
+- New "Restore subscriber counts" toggle on the options page, independent from
+  the view-count toggle.
+
 ## [1.1.7]
 
 ### Added

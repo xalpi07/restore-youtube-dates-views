@@ -5,6 +5,7 @@
 const DEFAULT_SETTINGS = Object.freeze({
   restoreDates: true,
   restoreViews: true,
+  restoreSubscribers: true,
   debug: false,
   locale: 'auto', // 'auto' detects the language of YouTube's interface
 });
