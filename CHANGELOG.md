@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.10]
+
+### Fixed
+
+- Counts wrapped in invisible bidi/formatting characters (e.g. the
+  "Collaborators" modal: `‎⁨33.8 M de suscriptores⁩`) are now recognized. These
+  marks (LRM/RLM, directional isolates, zero-width) are stripped before
+  matching.
+
 ## [1.1.9]
 
 ### Added

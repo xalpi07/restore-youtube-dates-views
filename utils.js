@@ -18,6 +18,15 @@ function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Invisible bidi/formatting characters that YouTube injects around text
+// (e.g. in the "Collaborators" modal): LRM/RLM, directional isolates and
+// zero-width marks. We drop them before matching so anchored regexes still work.
+const _formattingRegex = /[\u200B-\u200F\u2066-\u2069\uFEFF]/g;
+
+function stripFormatting(text) {
+  return text.replace(_formattingRegex, '');
+}
+
 // Relative date, anchored so the node is EXACTLY a date. Allows a trailing dot
 // after the abbreviation ("sem." → weeks) and the adverb before the value
 // ("hace 3 sem") or after it ("3 weeks ago"), depending on the language.
@@ -201,9 +210,10 @@ function transformMetadataText(text, settings, metadata = false, contextKind = n
 // Transform a single piece (date or count). `metadata` allows converting
 // 2K/4K/8K and plain numbers; `contextKind` selects subscribers/videos wording
 // for numbers without an explicit word.
-function transformSegment(text, settings, metadata = false, contextKind = null) {
+function transformSegment(rawText, settings, metadata = false, contextKind = null) {
   const code = settings.locale ?? DEFAULT_LOCALE;
   const locale = getLocale(code);
+  const text = stripFormatting(rawText);
 
   if (settings.restoreDates) {
     const date = transformDate(text, locale, code);
