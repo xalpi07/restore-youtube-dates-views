@@ -1,0 +1,19 @@
+# Paquetes generados
+*.zip
+*.xpi
+*.crx
+*.pem
+web-ext-artifacts/
+
+# Dependencias (por si en el futuro se añade tooling)
+node_modules/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores / IDE
+.vscode/
+.idea/
+*.swp

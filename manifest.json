@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Restaurar fechas y vistas de YouTube",
+  "version": "1.0.0",
+  "description": "Restaura el formato largo de fechas (\"hace 3 meses\") y de vistas (\"13 mil vistas\") que YouTube abrevió. Basado en patrones de texto, no en clases CSS.",
+
+  "icons": {},
+
+  "permissions": ["storage"],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["constants.js", "utils.js", "content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "yt-restaurar-fechas@ejemplo.dev",
+      "strict_min_version": "115.0"
+    }
+  }
+}

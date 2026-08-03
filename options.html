@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opciones · Restaurar fechas y vistas de YouTube</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <header class="card__header">
+      <h1 class="card__title">Restaurar fechas y vistas de YouTube</h1>
+      <p class="card__subtitle">
+        Devuelve el formato largo a las fechas ("hace 3 meses") y a las vistas
+        ("13 mil vistas") que YouTube abrevió.
+      </p>
+    </header>
+
+    <section class="options">
+      <!-- Restaurar fechas -->
+      <label class="option">
+        <input type="checkbox" id="restoreDates" />
+        <span class="option__text">
+          <span class="option__label">Restaurar fechas completas</span>
+          <span class="option__hint">"hace 3 m" → "hace 3 meses"</span>
+        </span>
+      </label>
+
+      <!-- Restaurar vistas -->
+      <label class="option">
+        <input type="checkbox" id="restoreViews" />
+        <span class="option__text">
+          <span class="option__label">Restaurar texto de vistas</span>
+          <span class="option__hint">"13 K" → "13 mil vistas"</span>
+        </span>
+      </label>
+
+      <!-- Logs -->
+      <label class="option">
+        <input type="checkbox" id="debug" />
+        <span class="option__text">
+          <span class="option__label">Mostrar logs en consola</span>
+          <span class="option__hint">Útil para depurar (DevTools).</span>
+        </span>
+      </label>
+    </section>
+
+    <footer class="card__footer">
+      <span id="status" class="status" role="status" aria-live="polite"></span>
+    </footer>
+  </main>
+
+  <script src="constants.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
