@@ -7,6 +7,9 @@
   const api = globalThis.browser ?? globalThis.chrome;
 
   let settings = { ...DEFAULT_SETTINGS };
+  // Opciones "efectivas": como `settings` pero con el idioma ya resuelto
+  // (la preferencia 'auto' se traduce al idioma real de la interfaz).
+  let effective = { ...DEFAULT_SETTINGS, locale: DEFAULT_LOCALE };
 
   // Guarda la última salida escrita por nodo para no reprocesar y para romper
   // el bucle que provocaría el observer al detectar nuestra propia escritura.
@@ -19,12 +22,17 @@
     if (settings.debug) console.log(LOG_PREFIX, ...args);
   }
 
+  function recomputeEffective() {
+    const uiLang = document.documentElement.lang || navigator.language;
+    effective = { ...settings, locale: resolveLocaleCode(settings.locale, uiLang) };
+  }
+
   function processTextNode(node) {
     const value = node.nodeValue;
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
 
-    const output = transformText(value, settings);
+    const output = transformText(value, effective);
     if (output === null || output === value) return;
 
     node.nodeValue = output; // solo se modifica el texto visible, nunca el HTML
@@ -74,9 +82,10 @@
 
   function registerSpaNavigation() {
     for (const eventName of YT_NAVIGATION_EVENTS) {
-      document.addEventListener(eventName, () => queueMicrotask(fullScan), {
-        passive: true,
-      });
+      document.addEventListener(eventName, () => {
+        recomputeEffective(); // el idioma de la UI podría haber cambiado
+        queueMicrotask(fullScan);
+      }, { passive: true });
     }
   }
 
@@ -87,6 +96,7 @@
     } catch (err) {
       console.warn(LOG_PREFIX, 'No se pudieron leer las opciones:', err);
     }
+    recomputeEffective();
     fullScan();
   }
 
@@ -97,6 +107,7 @@
       for (const [key, { newValue }] of Object.entries(changes)) {
         if (key in settings) settings[key] = newValue;
       }
+      recomputeEffective();
       fullScan();
     });
   }

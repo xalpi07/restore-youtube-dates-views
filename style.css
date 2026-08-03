@@ -102,6 +102,21 @@ body {
   font-size: 0.85rem;
 }
 
+.option--select {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.option__select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
 .card__footer {
   min-height: 20px;
   margin-top: 12px;

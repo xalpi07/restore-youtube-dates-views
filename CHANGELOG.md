@@ -5,7 +5,18 @@ Todas las novedades relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
-## [1.0.0] - 2025-01-01
+## [1.1.0]
+
+### Añadido
+
+- Soporte de semanas en español: `hace 3 sem` → `hace 3 semanas` (también
+  admite el punto: `hace 3 sem.`).
+- Motor multi-idioma real: español, inglés, portugués, francés, italiano y
+  alemán, con adverbio antes o después de la fecha según el idioma.
+- Detección automática del idioma de la interfaz de YouTube y selector de
+  idioma en la página de opciones (opción "Automático").
+
+## [1.0.0]
 
 ### Añadido
 
