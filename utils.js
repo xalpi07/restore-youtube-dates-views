@@ -102,33 +102,68 @@ function isAmbiguousResolutionText(text) {
   return !!m && RESOLUTION_BLOCKLIST.has(`${m[1]}${m[2].toUpperCase()}`);
 }
 
-// Señales de que un texto pertenece a la línea de metadatos de un vídeo:
-// separador ·, un adverbio de fecha o la palabra de vistas en varios idiomas.
-const _metadataSignalRegex =
-  /(·|\bhace\b|\bago\b|\bh[áa]\b|il y a|\bfa\b|\bvor\b|vistas?|views?|vues?|aufrufe|reproducciones?|visualiza\p{L}+)/iu;
+// Adverbios de fecha y palabras de vistas en varios idiomas: señal "fuerte"
+// de que el texto es la línea de metadatos de un vídeo.
+const _strongSignalRegex =
+  /(\bhace\b|\bago\b|\bh[áa]\b|il y a|\bfa\b|\bvor\b|vistas?|views?|vues?|aufrufe|reproducciones?|visualiza\p{L}+)/iu;
 
-function hasMetadataSignal(text) {
-  return _metadataSignalRegex.test(text);
+function hasStrongMetadataSignal(text) {
+  return _strongSignalRegex.test(text);
 }
 
-function transformText(text, settings) {
-  const locale = getLocale(settings.locale ?? DEFAULT_LOCALE);
+// Igual que la anterior, pero admitiendo también los separadores · y •; se usa
+// para inspeccionar el texto de los ancestros de un nodo.
+function hasMetadataSignal(text) {
+  return /[·•]/.test(text) || hasStrongMetadataSignal(text);
+}
+
+// Un mismo nodo puede contener varias piezas separadas por • o ·, p. ej.
+// "683K • 8mo ago". Dividimos por el separador (conservándolo) y transformamos
+// cada segmento por separado. Devuelve el texto recompuesto o null si nada
+// cambió.
+const _separatorRegex = /(\s*[·•]\s*)/;
+
+function transformMetadataText(text, settings, allowResolution = false) {
+  const parts = text.split(_separatorRegex);
+  let changed = false;
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (!part || !/\d/.test(part) || _separatorRegex.test(part)) continue;
+    const result = transformSegment(part, settings, allowResolution);
+    if (result !== null && result !== part) {
+      parts[i] = result;
+      changed = true;
+    }
+  }
+  return changed ? parts.join('') : null;
+}
+
+// Transforma una única pieza (fecha o vistas). `allowResolution` permite
+// convertir 2K/4K/8K como vistas cuando el contexto confirma que son metadatos.
+function transformSegment(text, settings, allowResolution = false) {
   const code = settings.locale ?? DEFAULT_LOCALE;
+  const locale = getLocale(code);
 
   if (settings.restoreDates) {
     const date = transformDate(text, locale, code);
     if (date !== null) return date;
   }
   if (settings.restoreViews) {
-    const views = transformViews(text, locale);
+    const views = transformViews(text, locale, allowResolution);
     if (views !== null) return views;
   }
   return null;
 }
 
-// Pre-filtro barato: sin dígitos no hay nada que transformar.
+function transformText(text, settings) {
+  return transformSegment(text, settings, false);
+}
+
+// Pre-filtro barato: sin dígitos no hay nada que transformar. El límite de
+// longitud descarta descripciones/párrafos, pero deja pasar líneas de metadatos
+// combinadas ("Canal • 683K • 8mo ago").
 function isCandidateText(text) {
-  return text.length > 0 && text.length < 40 && /\d/.test(text);
+  return text.length > 0 && text.length < 100 && /\d/.test(text);
 }
 
 // Resuelve el código de idioma efectivo: 'auto' usa el idioma de la UI de

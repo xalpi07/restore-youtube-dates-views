@@ -44,15 +44,14 @@
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
 
-    let output = transformText(value, effective);
-    if (
-      output === null &&
-      effective.restoreViews &&
-      isAmbiguousResolutionText(value) &&
-      inMetadataContext(node)
-    ) {
-      output = transformViews(value, getLocale(effective.locale), true);
-    }
+    // Permitimos convertir 2K/4K/8K como vistas cuando el propio texto ya es
+    // metadato (contiene fecha/palabra de vistas) o cuando el contexto lo
+    // confirma. Si no, se dejan intactos por ser resoluciones.
+    const allowResolution =
+      hasStrongMetadataSignal(value) ||
+      (isAmbiguousResolutionText(value) && inMetadataContext(node));
+
+    const output = transformMetadataText(value, effective, allowResolution);
     if (output === null || output === value) return;
 
     node.nodeValue = output; // solo se modifica el texto visible, nunca el HTML

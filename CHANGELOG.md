@@ -5,6 +5,15 @@ Todas las novedades relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.1.3]
+
+### Corregido
+
+- Metadatos combinados en un solo nodo de texto (p. ej. las *watch cards* de
+  búsqueda: `FromSoftware, Inc. • 683K • 8mo ago`). Ahora el texto se divide por
+  el separador (• o ·) y se transforma cada pieza por separado.
+- Se reconoce también el separador • (bullet), no solo · (middot).
+
 ## [1.1.2]
 
 ### Corregido
