@@ -64,6 +64,8 @@ yt-restaurar-fechas/
 ├── options.html      → Página de opciones (UI)
 ├── options.js        → Lógica de la página de opciones
 ├── style.css         → Estilos de la página de opciones
+├── icons/            → Iconos 16/32/48/128 (PNG)
+├── tools/            → Script para regenerar iconos (make_icons.py)
 └── README.md         → Este documento
 ```
 
@@ -151,11 +153,10 @@ El mismo ZIP sirve para Chrome Web Store y para AMO.
    - Descripción, capturas (1280×800), icono 128×128.
    - **Permisos**: solo `storage` (justifica que no se recopilan datos).
    - Política de privacidad (no se recogen datos personales).
+   - Los iconos ya están incluidos en `icons/` y declarados en el manifest.
+     Para regenerarlos: `python tools/make_icons.py` (requiere Pillow).
 4. Selecciona visibilidad (pública / no listada) y **Enviar a revisión**.
 5. La revisión suele tardar de horas a pocos días.
-
-> Sugerencia: añade iconos reales en la carpeta y decláralos en
-> `manifest.json → "icons"` antes de publicar (Chrome los exige en la ficha).
 
 ---
 
