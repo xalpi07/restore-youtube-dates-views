@@ -54,6 +54,9 @@ trending, history, watch page, Shorts, etc.
 - **Cross-browser.** Chrome, Brave, Edge and Firefox from the same code
   (Manifest V3).
 - **No dependencies.** Plain JavaScript.
+- **Plays well with others.** Text inside interactive widgets (like/dislike
+  buttons, etc.) is skipped, so it doesn't clash with extensions such as
+  Return YouTube Dislike.
 
 ---
 

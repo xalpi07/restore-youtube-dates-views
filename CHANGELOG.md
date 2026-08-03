@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.5]
+
+### Fixed
+
+- Compatibility with other extensions (e.g. Return YouTube Dislike). Text
+  inside interactive widgets (buttons, `[role="button"]`, the like/dislike
+  view-models, `contenteditable`) is now skipped. Rewriting a dislike counter
+  caused an infinite update loop between extensions that froze the page and
+  prevented videos from loading. View counts and dates are never inside these
+  widgets, so nothing is lost.
+
 ## [1.1.4]
 
 ### Added

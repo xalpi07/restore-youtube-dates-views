@@ -40,10 +40,25 @@
     return false;
   }
 
+  // Interactive widgets whose text we must never touch. Like/dislike counters
+  // (including those injected by other extensions, e.g. Return YouTube Dislike)
+  // live inside buttons; rewriting them causes an infinite update loop between
+  // extensions that freezes the page. View counts and dates never live here.
+  const INTERACTIVE_SELECTOR =
+    'button, [role="button"], [contenteditable="true"], ' +
+    'like-button-view-model, dislike-button-view-model, ' +
+    'segmented-like-dislike-button-view-model, ytd-toggle-button-renderer';
+
+  function isInInteractiveElement(node) {
+    const el = node.parentElement;
+    return !!(el && el.closest(INTERACTIVE_SELECTOR));
+  }
+
   function processTextNode(node) {
     const value = node.nodeValue;
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
+    if (isInInteractiveElement(node)) return;
 
     // Mark the text as confirmed metadata when the node itself already contains
     // a date or the word "views", or when the context confirms it. Only then do
