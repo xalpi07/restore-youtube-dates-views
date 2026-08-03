@@ -4,7 +4,7 @@
   'use strict';
 
   const api = globalThis.browser ?? globalThis.chrome;
-  const CHECKBOXES = ['restoreDates', 'restoreViews', 'restoreSubscribers', 'debug'];
+  const CHECKBOXES = ['restoreDates', 'restoreViews', 'restoreSubscribers', 'restoreVideos', 'debug'];
   const statusEl = document.getElementById('status');
   let statusTimer = null;
 

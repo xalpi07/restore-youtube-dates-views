@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.9]
+
+### Added
+
+- Video counts are now expanded: `1.8 K videos` → `1.8 mil videos` (and the
+  equivalents in the other languages). Works on channels, playlists and any
+  section where a video count appears.
+- New independent "Restore video counts" toggle on the options page.
+
 ## [1.1.8]
 
 ### Added

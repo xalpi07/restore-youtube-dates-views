@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Restore YouTube Dates & Views",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Restores the long format of YouTube dates (\"3 months ago\") and view counts (\"13 thousand views\") that YouTube shortened. Based on text patterns, not CSS classes.",
 
   "icons": {

@@ -54,15 +54,26 @@
     return !!(el && el.closest(INTERACTIVE_SELECTOR));
   }
 
-  // A subscriber count ("82.2 M subscribers") looks like a view count. If the
-  // node or a short ancestor mentions subscribers, leave the number untouched.
-  function inSubscriberContext(node) {
+  // Subscriber and video counts ("82.2 M subscribers", "1.8 K videos") use the
+  // same K/M/B format as views. If the node or a short ancestor mentions them,
+  // return the matching kind so we expand with the right wording.
+  function ancestorMatches(node, signalFn) {
     let el = node.parentElement;
     for (let i = 0; i < 4 && el; i++, el = el.parentElement) {
       const text = el.textContent;
-      if (text && text.length < 80 && hasSubscriberSignal(text)) return true;
+      if (text && text.length < 80 && signalFn(text)) return true;
     }
     return false;
+  }
+
+  function detectContextKind(node, value) {
+    if (hasSubscriberSignal(value) || ancestorMatches(node, hasSubscriberSignal)) {
+      return 'subscribers';
+    }
+    if (hasVideoSignal(value) || ancestorMatches(node, hasVideoSignal)) {
+      return 'videos';
+    }
+    return null;
   }
 
   function processTextNode(node) {
@@ -71,19 +82,19 @@
     if (lastOutputs.get(node) === value) return;
     if (isInInteractiveElement(node)) return;
 
-    // A subscriber count uses the same K/M/B format as views but a different
-    // word. Detect it (by the node text or a short ancestor) so we expand it as
-    // "… subscribers" instead of "… views".
-    const subscriber = hasSubscriberSignal(value) || inSubscriberContext(node);
+    // Subscriber/video counts use the same K/M/B format as views but a
+    // different word. Detect the kind (from the node text or a short ancestor)
+    // so we expand with the right wording.
+    const contextKind = detectContextKind(node, value);
 
     // Mark the text as confirmed metadata when the node itself already contains
     // a date/count word, or when the context confirms it. Only then do we
     // convert ambiguous values (2K/4K/8K) and plain numbers.
     const ambiguous = isAmbiguousResolutionText(value) || isPlainCountText(value);
     const metadata =
-      hasStrongMetadataSignal(value) || subscriber || (ambiguous && inMetadataContext(node));
+      hasStrongMetadataSignal(value) || contextKind !== null || (ambiguous && inMetadataContext(node));
 
-    const output = transformMetadataText(value, effective, metadata, subscriber);
+    const output = transformMetadataText(value, effective, metadata, contextKind);
     if (output === null || output === value) return;
 
     node.nodeValue = output; // only the visible text is changed, never the HTML

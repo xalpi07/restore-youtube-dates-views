@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   restoreDates: true,
   restoreViews: true,
   restoreSubscribers: true,
+  restoreVideos: true,
   debug: false,
   locale: 'auto', // 'auto' detects the language of YouTube's interface
 });
@@ -47,6 +48,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} mil millones de suscriptores', other: '{n} mil millones de suscriptores' },
     },
     subscribersCount: { one: '{n} suscriptor', other: '{n} suscriptores' },
+    videos: {
+      K: { one: '{n} mil videos',             other: '{n} mil videos' },
+      M: { one: '{n} millón de videos',       other: '{n} millones de videos' },
+      B: { one: '{n} mil millones de videos', other: '{n} mil millones de videos' },
+    },
+    videosCount: { one: '{n} video', other: '{n} videos' },
   },
 
   en: {
@@ -73,6 +80,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} billion subscribers',  other: '{n} billion subscribers' },
     },
     subscribersCount: { one: '{n} subscriber', other: '{n} subscribers' },
+    videos: {
+      K: { one: '{n} thousand videos', other: '{n} thousand videos' },
+      M: { one: '{n} million videos',  other: '{n} million videos' },
+      B: { one: '{n} billion videos',  other: '{n} billion videos' },
+    },
+    videosCount: { one: '{n} video', other: '{n} videos' },
   },
 
   pt: {
@@ -99,6 +112,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} bilhão de inscritos',other: '{n} bilhões de inscritos' },
     },
     subscribersCount: { one: '{n} inscrito', other: '{n} inscritos' },
+    videos: {
+      K: { one: '{n} mil vídeos',      other: '{n} mil vídeos' },
+      M: { one: '{n} milhão de vídeos',other: '{n} milhões de vídeos' },
+      B: { one: '{n} bilhão de vídeos',other: '{n} bilhões de vídeos' },
+    },
+    videosCount: { one: '{n} vídeo', other: '{n} vídeos' },
   },
 
   fr: {
@@ -125,6 +144,12 @@ const LOCALES = Object.freeze({
       B: { one: "{n} milliard d'abonnés",other: "{n} milliards d'abonnés" },
     },
     subscribersCount: { one: '{n} abonné', other: '{n} abonnés' },
+    videos: {
+      K: { one: '{n} mille vidéos',    other: '{n} mille vidéos' },
+      M: { one: '{n} million de vidéos', other: '{n} millions de vidéos' },
+      B: { one: '{n} milliard de vidéos',other: '{n} milliards de vidéos' },
+    },
+    videosCount: { one: '{n} vidéo', other: '{n} vidéos' },
   },
 
   it: {
@@ -151,6 +176,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} miliardo di iscritti',other: '{n} miliardi di iscritti' },
     },
     subscribersCount: { one: '{n} iscritto', other: '{n} iscritti' },
+    videos: {
+      K: { one: '{n} mila video',       other: '{n} mila video' },
+      M: { one: '{n} milione di video', other: '{n} milioni di video' },
+      B: { one: '{n} miliardo di video',other: '{n} miliardi di video' },
+    },
+    videosCount: { one: '{n} video', other: '{n} video' },
   },
 
   de: {
@@ -177,6 +208,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} Mrd. Abonnenten', other: '{n} Mrd. Abonnenten' },
     },
     subscribersCount: { one: '{n} Abonnent', other: '{n} Abonnenten' },
+    videos: {
+      K: { one: '{n} Tsd. Videos', other: '{n} Tsd. Videos' },
+      M: { one: '{n} Mio. Videos', other: '{n} Mio. Videos' },
+      B: { one: '{n} Mrd. Videos', other: '{n} Mrd. Videos' },
+    },
+    videosCount: { one: '{n} Video', other: '{n} Videos' },
   },
 });
 
