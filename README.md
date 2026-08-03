@@ -180,14 +180,12 @@ La primera versión solo incluye **español (es-419)**. El diseño ya está
 preparado para más idiomas:
 
 1. Abre `constants.js`.
-2. Añade una entrada en `LOCALES` (hay plantillas comentadas para `en`, `pt`,
-   `fr`, `it`, `de`).
+2. Añade una entrada en `LOCALES` replicando la estructura de `es`.
 3. Rellena `dateAdverb`, `units` (singular/plural) y `views`.
 4. No hace falta tocar `utils.js` ni `content.js`.
 
 > Nota: idiomas con adverbio pospuesto (inglés: *"3 months ago"*) requieren una
-> pequeña variante en la construcción de la regex de fechas; queda indicado en
-> los comentarios de `constants.js`.
+> pequeña variante en la construcción de la regex de fechas.
 
 ---
 

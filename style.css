@@ -1,10 +1,4 @@
-/**
- * style.css
- * -----------------------------------------------------------------------------
- * Estilos de la página de opciones. Ligero, sin dependencias externas y
- * compatible con modo claro/oscuro (prefers-color-scheme).
- * -----------------------------------------------------------------------------
- */
+/* Estilos de la página de opciones (modo claro/oscuro). */
 
 :root {
   --bg: #f4f4f5;
