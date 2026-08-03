@@ -162,6 +162,38 @@ python tools/make_icons.py
 
 ---
 
+## Background — why YouTube shows abbreviated metadata
+
+YouTube started showing compact metadata (`3 m`, `13K`, `1.8K videos`) through a
+server-side rollout, not a user setting. You can see it in the client's
+experiment flags:
+
+```js
+const f = (window.ytcfg && ytcfg.data_ && ytcfg.data_.EXPERIMENT_FLAGS) || {};
+console.table(Object.entries(f).filter(([k]) => /metadata|concise|compact/i.test(k)));
+console.log('HL:', ytcfg.get('HL'), 'GL:', ytcfg.get('GL')); // language / region
+```
+
+The two flags behind the shortened text are:
+
+- **`desktop_enable_new_video_metadata`** — enables the new desktop metadata
+  block.
+- **`web_official_card_concise_lockup_metadata`** — "concise lockup metadata",
+  i.e. the abbreviated text under video cards.
+
+In testing (locale `es-419`, region `CR`) these flags were `true` **both when
+signed in and in a private window**, so it is a general rollout tied to the
+region/experiment, not to a specific account. The reason it may first appear
+"only while signed in" is simply rollout timing (experiments ramp from a small
+percentage to everyone).
+
+Because the shortened text often arrives **already abbreviated from the server**
+(note the paired `..._web` / `..._web_innertube` flags), there is no toggle to
+get the long format back — the text must be rewritten on the client. And since
+YouTube can change, expand or revert this at any time and it varies by
+language/region, the resilient approach is to match by **text pattern** rather
+than CSS classes or a specific flag. That is exactly what this extension does.
+
 ## Contributing
 
 1. Fork the repo and create a branch.
