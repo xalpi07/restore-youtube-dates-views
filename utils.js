@@ -77,20 +77,38 @@ function normalizeToken(raw, locale) {
   return lower;
 }
 
-function transformViews(text, locale) {
+function transformViews(text, locale, allowResolution = false) {
   const match = getViewsRegex().exec(text);
   if (!match) return null;
 
   const number = match[1];
   const suffix = match[3].toUpperCase();
   const bare = match[2] === '' && !match[4]; // sin espacio ni palabra
-  if (bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) return null;
+  if (!allowResolution && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
+    return null;
+  }
 
   const cfg = locale.views[suffix];
   if (!cfg) return null;
 
   const template = number === '1' ? cfg.one : cfg.other;
   return template.replace('{n}', number);
+}
+
+// ¿El texto es exactamente un valor ambiguo (2K/4K/8K) que puede ser tanto
+// resolución como contador de vistas?
+function isAmbiguousResolutionText(text) {
+  const m = /^\s*(\d+)\s*([KMB])\s*$/i.exec(text);
+  return !!m && RESOLUTION_BLOCKLIST.has(`${m[1]}${m[2].toUpperCase()}`);
+}
+
+// Señales de que un texto pertenece a la línea de metadatos de un vídeo:
+// separador ·, un adverbio de fecha o la palabra de vistas en varios idiomas.
+const _metadataSignalRegex =
+  /(·|\bhace\b|\bago\b|\bh[áa]\b|il y a|\bfa\b|\bvor\b|vistas?|views?|vues?|aufrufe|reproducciones?|visualiza\p{L}+)/iu;
+
+function hasMetadataSignal(text) {
+  return _metadataSignalRegex.test(text);
 }
 
 function transformText(text, settings) {

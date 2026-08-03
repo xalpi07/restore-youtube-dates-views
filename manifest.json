@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Restaurar fechas y vistas de YouTube",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Restaura el formato largo de fechas (\"hace 3 meses\") y de vistas (\"13 mil vistas\") que YouTube abrevió. Basado en patrones de texto, no en clases CSS.",
 
   "icons": {

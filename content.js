@@ -27,12 +27,32 @@
     effective = { ...settings, locale: resolveLocaleCode(settings.locale, uiLang) };
   }
 
+  // Para valores ambiguos (2K/4K/8K) mira el texto de hasta 4 ancestros cortos:
+  // si contienen una fecha, la palabra "vistas/views" o el separador "·", es la
+  // línea de metadatos de un vídeo, así que el valor son vistas (no resolución).
+  function inMetadataContext(node) {
+    let el = node.parentElement;
+    for (let i = 0; i < 4 && el; i++, el = el.parentElement) {
+      const text = el.textContent;
+      if (text && text.length < 60 && hasMetadataSignal(text)) return true;
+    }
+    return false;
+  }
+
   function processTextNode(node) {
     const value = node.nodeValue;
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
 
-    const output = transformText(value, effective);
+    let output = transformText(value, effective);
+    if (
+      output === null &&
+      effective.restoreViews &&
+      isAmbiguousResolutionText(value) &&
+      inMetadataContext(node)
+    ) {
+      output = transformViews(value, getLocale(effective.locale), true);
+    }
     if (output === null || output === value) return;
 
     node.nodeValue = output; // solo se modifica el texto visible, nunca el HTML

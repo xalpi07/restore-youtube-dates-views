@@ -5,6 +5,15 @@ Todas las novedades relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.1.2]
+
+### Corregido
+
+- Valores ambiguos `2K`/`4K`/`8K` que en realidad son vistas ahora se
+  restauran cuando aparecen en la línea de metadatos de un vídeo (junto a una
+  fecha, la palabra "vistas/views" o el separador ·). En el menú de calidad del
+  reproductor se siguen dejando intactos como resolución.
+
 ## [1.1.1]
 
 ### Corregido
