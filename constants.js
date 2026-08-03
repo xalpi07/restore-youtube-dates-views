@@ -38,6 +38,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} millón de vistas',       other: '{n} millones de vistas' },
       B: { one: '{n} mil millones de vistas', other: '{n} mil millones de vistas' },
     },
+    count: { one: '{n} vista', other: '{n} vistas' },
   },
 
   en: {
@@ -57,6 +58,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} million views',  other: '{n} million views' },
       B: { one: '{n} billion views',  other: '{n} billion views' },
     },
+    count: { one: '{n} view', other: '{n} views' },
   },
 
   pt: {
@@ -76,6 +78,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} milhão de visualizações',other: '{n} milhões de visualizações' },
       B: { one: '{n} bilhão de visualizações',other: '{n} bilhões de visualizações' },
     },
+    count: { one: '{n} visualização', other: '{n} visualizações' },
   },
 
   fr: {
@@ -95,6 +98,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} million de vues', other: '{n} millions de vues' },
       B: { one: '{n} milliard de vues',other: '{n} milliards de vues' },
     },
+    count: { one: '{n} vue', other: '{n} vues' },
   },
 
   it: {
@@ -114,6 +118,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} milione di visualizzazioni',other: '{n} milioni di visualizzazioni' },
       B: { one: '{n} miliardo di visualizzazioni',other: '{n} miliardi di visualizzazioni' },
     },
+    count: { one: '{n} visualizzazione', other: '{n} visualizzazioni' },
   },
 
   de: {
@@ -133,6 +138,7 @@ const LOCALES = Object.freeze({
       M: { one: '{n} Mio. Aufrufe', other: '{n} Mio. Aufrufe' },
       B: { one: '{n} Mrd. Aufrufe', other: '{n} Mrd. Aufrufe' },
     },
+    count: { one: '{n} Aufruf', other: '{n} Aufrufe' },
   },
 });
 

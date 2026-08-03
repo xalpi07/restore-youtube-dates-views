@@ -44,14 +44,14 @@
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
 
-    // Permitimos convertir 2K/4K/8K como vistas cuando el propio texto ya es
-    // metadato (contiene fecha/palabra de vistas) o cuando el contexto lo
-    // confirma. Si no, se dejan intactos por ser resoluciones.
-    const allowResolution =
-      hasStrongMetadataSignal(value) ||
-      (isAmbiguousResolutionText(value) && inMetadataContext(node));
+    // Marca el texto como metadato confirmado cuando el propio nodo ya contiene
+    // una fecha o la palabra de vistas, o cuando el contexto lo confirma. Solo
+    // entonces se convierten valores ambiguos (2K/4K/8K) y números planos.
+    const ambiguous = isAmbiguousResolutionText(value) || isPlainCountText(value);
+    const metadata =
+      hasStrongMetadataSignal(value) || (ambiguous && inMetadataContext(node));
 
-    const output = transformMetadataText(value, effective, allowResolution);
+    const output = transformMetadataText(value, effective, metadata);
     if (output === null || output === value) return;
 
     node.nodeValue = output; // solo se modifica el texto visible, nunca el HTML

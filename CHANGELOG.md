@@ -5,6 +5,15 @@ Todas las novedades relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.1.4]
+
+### Añadido
+
+- Contadores planos de menos de mil vistas (p. ej. `632` → `632 vistas`,
+  `1` → `1 vista`). Solo se convierten cuando el contexto confirma que son
+  metadatos de vídeo (hay una fecha o la palabra de vistas al lado), de modo
+  que no se tocan años, resoluciones ni números sueltos.
+
 ## [1.1.3]
 
 ### Corregido

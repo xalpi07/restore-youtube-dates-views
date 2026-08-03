@@ -77,22 +77,32 @@ function normalizeToken(raw, locale) {
   return lower;
 }
 
-function transformViews(text, locale, allowResolution = false) {
+// `metadata` indica que el contexto confirma que es la línea de metadatos de un
+// vídeo; solo entonces se convierten valores ambiguos (2K/4K/8K) y números
+// planos (< 1000 vistas, p. ej. "632").
+function transformViews(text, locale, metadata = false) {
   const match = getViewsRegex().exec(text);
-  if (!match) return null;
-
-  const number = match[1];
-  const suffix = match[3].toUpperCase();
-  const bare = match[2] === '' && !match[4]; // sin espacio ni palabra
-  if (!allowResolution && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
-    return null;
+  if (match) {
+    const number = match[1];
+    const suffix = match[3].toUpperCase();
+    const bare = match[2] === '' && !match[4]; // sin espacio ni palabra
+    if (!metadata && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
+      return null;
+    }
+    const cfg = locale.views[suffix];
+    if (!cfg) return null;
+    return (number === '1' ? cfg.one : cfg.other).replace('{n}', number);
   }
 
-  const cfg = locale.views[suffix];
-  if (!cfg) return null;
-
-  const template = number === '1' ? cfg.one : cfg.other;
-  return template.replace('{n}', number);
+  // Número plano (1-3 dígitos): solo si el contexto confirma que son vistas.
+  if (metadata && locale.count) {
+    const plain = /^\s*(\d{1,3})\s*$/.exec(text);
+    if (plain) {
+      const n = plain[1];
+      return (n === '1' ? locale.count.one : locale.count.other).replace('{n}', n);
+    }
+  }
+  return null;
 }
 
 // ¿El texto es exactamente un valor ambiguo (2K/4K/8K) que puede ser tanto
@@ -100,6 +110,11 @@ function transformViews(text, locale, allowResolution = false) {
 function isAmbiguousResolutionText(text) {
   const m = /^\s*(\d+)\s*([KMB])\s*$/i.exec(text);
   return !!m && RESOLUTION_BLOCKLIST.has(`${m[1]}${m[2].toUpperCase()}`);
+}
+
+// ¿El texto es un número plano de 1-3 dígitos (posible contador < 1000)?
+function isPlainCountText(text) {
+  return /^\s*\d{1,3}\s*$/.test(text);
 }
 
 // Adverbios de fecha y palabras de vistas en varios idiomas: señal "fuerte"
