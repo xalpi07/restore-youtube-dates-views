@@ -40,14 +40,17 @@ function getDateRegex(locale, code) {
   return regex;
 }
 
-// Groups: 1) number  2) space (optional)  3) K/M/B suffix  4) views word
-// (optional, multilingual). The decimal accepts a comma or a dot. If an unknown
-// word follows the suffix (e.g. "subscribers"), it does not match.
+// Groups: 1) number  2) space (optional)  3) K/M/B suffix  4) trailing word
+// (optional, multilingual: views OR subscribers). The decimal accepts a comma
+// or a dot. An unknown trailing word makes it fail to match.
+const _viewWords = 'vistas?|reproducciones?|views?|vues?|aufrufe|visualiza\\p{L}+';
+const _subWords = 'suscriptor\\p{L}*|subscriber\\p{L}*|inscrito\\p{L}*|abonn\\p{L}*|iscritt\\p{L}*';
+
 function getViewsRegex() {
   if (_viewsRegex) return _viewsRegex;
-  const words = 'vistas?|reproducciones?|views?|vues?|aufrufe|visualiza\\p{L}+';
+  // Optional connector before the word: "de " (es/pt/it) or "d'" (fr).
   _viewsRegex = new RegExp(
-    `^\\s*(\\d+(?:[.,]\\d+)?)(\\s*)([KMB])\\s*(?:de\\s+)?(${words})?\\s*$`,
+    `^\\s*(\\d+(?:[.,]\\d+)?)(\\s*)([KMB])\\s*(?:de\\s+|d['\u2019]\\s*)?(${_viewWords}|${_subWords})?\\s*$`,
     'iu',
   );
   return _viewsRegex;
@@ -77,29 +80,37 @@ function normalizeToken(raw, locale) {
   return lower;
 }
 
-// `metadata` means the context confirms this is a video's metadata line; only
-// then do we convert ambiguous values (2K/4K/8K) and plain numbers (below
-// 1000 views, e.g. "632").
-function transformViews(text, locale, metadata = false) {
+// Transforms a view/subscriber count. `metadata` means the context confirms it
+// is a video's metadata line (needed to convert ambiguous 2K/4K/8K and plain
+// numbers). `subscriber` forces the subscriber vocabulary for bare numbers that
+// the context identified as a subscriber count.
+function transformCount(text, locale, metadata = false, subscriber = false) {
   const match = getViewsRegex().exec(text);
   if (match) {
     const number = match[1];
     const suffix = match[3].toUpperCase();
-    const bare = match[2] === '' && !match[4]; // no space and no word
-    if (!metadata && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
+    const word = match[4];
+    const bare = match[2] === '' && !word; // no space and no word
+
+    // Decide vocabulary: an explicit word wins; otherwise use the context.
+    const isSub = word ? hasSubscriberSignal(word) : subscriber;
+    if (!isSub && !metadata && bare && RESOLUTION_BLOCKLIST.has(`${number}${suffix}`)) {
       return null;
     }
-    const cfg = locale.views[suffix];
+    const table = isSub ? locale.subscribers : locale.views;
+    const cfg = table?.[suffix];
     if (!cfg) return null;
     return (number === '1' ? cfg.one : cfg.other).replace('{n}', number);
   }
 
   // Plain number (1-3 digits): only when the context confirms it is a count.
-  if (metadata && locale.count) {
+  if (metadata || subscriber) {
     const plain = /^\s*(\d{1,3})\s*$/.exec(text);
     if (plain) {
+      const table = subscriber ? locale.subscribersCount : locale.count;
+      if (!table) return null;
       const n = plain[1];
-      return (n === '1' ? locale.count.one : locale.count.other).replace('{n}', n);
+      return (n === '1' ? table.one : table.other).replace('{n}', n);
     }
   }
   return null;
@@ -145,13 +156,13 @@ function hasSubscriberSignal(text) {
 // piece independently. Returns the recomposed text, or null if nothing changed.
 const _separatorRegex = /(\s*[·•]\s*)/;
 
-function transformMetadataText(text, settings, allowResolution = false) {
+function transformMetadataText(text, settings, metadata = false, subscriber = false) {
   const parts = text.split(_separatorRegex);
   let changed = false;
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     if (!part || !/\d/.test(part) || _separatorRegex.test(part)) continue;
-    const result = transformSegment(part, settings, allowResolution);
+    const result = transformSegment(part, settings, metadata, subscriber);
     if (result !== null && result !== part) {
       parts[i] = result;
       changed = true;
@@ -160,9 +171,9 @@ function transformMetadataText(text, settings, allowResolution = false) {
   return changed ? parts.join('') : null;
 }
 
-// Transform a single piece (date or views). `allowResolution` allows converting
-// 2K/4K/8K as views when the context confirms it is metadata.
-function transformSegment(text, settings, allowResolution = false) {
+// Transform a single piece (date or count). `metadata` allows converting
+// 2K/4K/8K and plain numbers; `subscriber` selects the subscriber vocabulary.
+function transformSegment(text, settings, metadata = false, subscriber = false) {
   const code = settings.locale ?? DEFAULT_LOCALE;
   const locale = getLocale(code);
 
@@ -171,14 +182,14 @@ function transformSegment(text, settings, allowResolution = false) {
     if (date !== null) return date;
   }
   if (settings.restoreViews) {
-    const views = transformViews(text, locale, allowResolution);
-    if (views !== null) return views;
+    const count = transformCount(text, locale, metadata, subscriber);
+    if (count !== null) return count;
   }
   return null;
 }
 
 function transformText(text, settings) {
-  return transformSegment(text, settings, false);
+  return transformSegment(text, settings, false, false);
 }
 
 // Cheap pre-filter: no digits, nothing to transform. The length cap discards

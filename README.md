@@ -29,6 +29,7 @@ restores them automatically as you browse:
 | `1M`           | `1 million views`         |
 | `632`          | `632 views`               |
 | `1B`           | `1 billion views`         |
+| `35.5K` (subs) | `35.5 thousand subscribers` |
 
 It works across the whole platform: home, search, channel, subscriptions,
 trending, history, watch page, Shorts, etc.

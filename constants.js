@@ -40,6 +40,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} mil millones de vistas', other: '{n} mil millones de vistas' },
     },
     count: { one: '{n} vista', other: '{n} vistas' },
+    subscribers: {
+      K: { one: '{n} mil suscriptores',             other: '{n} mil suscriptores' },
+      M: { one: '{n} millón de suscriptores',       other: '{n} millones de suscriptores' },
+      B: { one: '{n} mil millones de suscriptores', other: '{n} mil millones de suscriptores' },
+    },
+    subscribersCount: { one: '{n} suscriptor', other: '{n} suscriptores' },
   },
 
   en: {
@@ -60,6 +66,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} billion views',  other: '{n} billion views' },
     },
     count: { one: '{n} view', other: '{n} views' },
+    subscribers: {
+      K: { one: '{n} thousand subscribers', other: '{n} thousand subscribers' },
+      M: { one: '{n} million subscribers',  other: '{n} million subscribers' },
+      B: { one: '{n} billion subscribers',  other: '{n} billion subscribers' },
+    },
+    subscribersCount: { one: '{n} subscriber', other: '{n} subscribers' },
   },
 
   pt: {
@@ -80,6 +92,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} bilhão de visualizações',other: '{n} bilhões de visualizações' },
     },
     count: { one: '{n} visualização', other: '{n} visualizações' },
+    subscribers: {
+      K: { one: '{n} mil inscritos',      other: '{n} mil inscritos' },
+      M: { one: '{n} milhão de inscritos',other: '{n} milhões de inscritos' },
+      B: { one: '{n} bilhão de inscritos',other: '{n} bilhões de inscritos' },
+    },
+    subscribersCount: { one: '{n} inscrito', other: '{n} inscritos' },
   },
 
   fr: {
@@ -100,6 +118,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} milliard de vues',other: '{n} milliards de vues' },
     },
     count: { one: '{n} vue', other: '{n} vues' },
+    subscribers: {
+      K: { one: '{n} mille abonnés',     other: '{n} mille abonnés' },
+      M: { one: "{n} million d'abonnés", other: "{n} millions d'abonnés" },
+      B: { one: "{n} milliard d'abonnés",other: "{n} milliards d'abonnés" },
+    },
+    subscribersCount: { one: '{n} abonné', other: '{n} abonnés' },
   },
 
   it: {
@@ -120,6 +144,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} miliardo di visualizzazioni',other: '{n} miliardi di visualizzazioni' },
     },
     count: { one: '{n} visualizzazione', other: '{n} visualizzazioni' },
+    subscribers: {
+      K: { one: '{n} mila iscritti',       other: '{n} mila iscritti' },
+      M: { one: '{n} milione di iscritti', other: '{n} milioni di iscritti' },
+      B: { one: '{n} miliardo di iscritti',other: '{n} miliardi di iscritti' },
+    },
+    subscribersCount: { one: '{n} iscritto', other: '{n} iscritti' },
   },
 
   de: {
@@ -140,6 +170,12 @@ const LOCALES = Object.freeze({
       B: { one: '{n} Mrd. Aufrufe', other: '{n} Mrd. Aufrufe' },
     },
     count: { one: '{n} Aufruf', other: '{n} Aufrufe' },
+    subscribers: {
+      K: { one: '{n} Tsd. Abonnenten', other: '{n} Tsd. Abonnenten' },
+      M: { one: '{n} Mio. Abonnenten', other: '{n} Mio. Abonnenten' },
+      B: { one: '{n} Mrd. Abonnenten', other: '{n} Mrd. Abonnenten' },
+    },
+    subscribersCount: { one: '{n} Abonnent', other: '{n} Abonnenten' },
   },
 });
 

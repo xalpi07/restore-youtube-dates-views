@@ -5,14 +5,22 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.7]
+
+### Added
+
+- Subscriber counts are now expanded with their own wording:
+  `35.5 K suscriptores` → `35.5 mil suscriptores`,
+  `82.2 M de suscriptores` → `82.2 millones de suscriptores`
+  (and the equivalents in English, Portuguese, French and Italian). Detected by
+  context, so the same number never becomes "views".
+
 ## [1.1.6]
 
 ### Fixed
 
-- Subscriber counts are no longer converted to view counts. A number next to a
-  "subscribers" word (in any supported language, e.g. `82.2 M de suscriptores`)
-  is now detected by context and left untouched, even when the number and the
-  word live in separate nodes.
+- Subscriber counts were no longer converted to view counts (superseded by
+  1.1.7, which expands them with the correct "subscribers" wording).
 
 ## [1.1.5]
 

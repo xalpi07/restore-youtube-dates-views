@@ -70,16 +70,20 @@
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
     if (isInInteractiveElement(node)) return;
-    if (inSubscriberContext(node)) return;
+
+    // A subscriber count uses the same K/M/B format as views but a different
+    // word. Detect it (by the node text or a short ancestor) so we expand it as
+    // "… subscribers" instead of "… views".
+    const subscriber = hasSubscriberSignal(value) || inSubscriberContext(node);
 
     // Mark the text as confirmed metadata when the node itself already contains
-    // a date or the word "views", or when the context confirms it. Only then do
-    // we convert ambiguous values (2K/4K/8K) and plain numbers.
+    // a date/count word, or when the context confirms it. Only then do we
+    // convert ambiguous values (2K/4K/8K) and plain numbers.
     const ambiguous = isAmbiguousResolutionText(value) || isPlainCountText(value);
     const metadata =
-      hasStrongMetadataSignal(value) || (ambiguous && inMetadataContext(node));
+      hasStrongMetadataSignal(value) || subscriber || (ambiguous && inMetadataContext(node));
 
-    const output = transformMetadataText(value, effective, metadata);
+    const output = transformMetadataText(value, effective, metadata, subscriber);
     if (output === null || output === value) return;
 
     node.nodeValue = output; // only the visible text is changed, never the HTML
