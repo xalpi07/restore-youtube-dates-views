@@ -114,10 +114,21 @@
     scheduleFlush();
   }
 
+  // Give the page/player a head start after each navigation: during this window
+  // we do no DOM walking at all, so the video can initialize without contention.
+  const STARTUP_DELAY_MS = 800;
+  let scanPausedUntil = 0;
+
+  function pauseScanning() {
+    scanPausedUntil = Date.now() + STARTUP_DELAY_MS;
+  }
+
   function scheduleFlush() {
     if (flushScheduled) return;
     flushScheduled = true;
-    runWhenIdle(flushWork);
+    const wait = scanPausedUntil - Date.now();
+    if (wait > 0) setTimeout(() => runWhenIdle(flushWork), wait);
+    else runWhenIdle(flushWork);
   }
 
   // Kept name: schedules a full-document pass (used on load and SPA navigation).
@@ -174,6 +185,7 @@
     for (const eventName of YT_NAVIGATION_EVENTS) {
       document.addEventListener(eventName, () => {
         recomputeEffective(); // the UI language might have changed
+        pauseScanning();      // let the new page/player settle first
         scheduleFullScan();
       }, { passive: true });
     }
@@ -203,16 +215,15 @@
   }
 
   function init() {
-    startObserver();
+    pauseScanning(); // give the initial page/player a head start
     registerSpaNavigation();
     watchSettings();
-    loadSettings();
+    loadSettings(); // reads options, resolves locale, schedules a deferred scan
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', scheduleFullScan, { once: true });
-    } else {
-      scheduleFullScan();
-    }
+    // Attach the observer only AFTER the startup window, so the browser never
+    // notifies us of the player's heavy initialization mutations. The initial
+    // content is still covered by the deferred full scan from loadSettings().
+    setTimeout(startObserver, STARTUP_DELAY_MS);
   }
 
   init();

@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.17]
+
+### Performance
+
+- The content script now runs at `document_idle` and attaches the
+  `MutationObserver` only after an ~800 ms startup window, so the browser never
+  notifies the extension of the player's heavy initialization mutations. The
+  initial content is still covered by a deferred full scan.
+- Measured with Playwright + system Chrome on a watch page: time-to-duration-
+  ready went from ~1590 ms (previous) to ~1211 ms, matching the no-extension
+  baseline (~1262 ms). The previous ~550 ms delay the extension added is gone.
+
 ## [1.1.16]
 
 ### Performance
