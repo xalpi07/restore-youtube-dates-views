@@ -160,6 +160,22 @@ To regenerate the icons (requires Pillow):
 python tools/make_icons.py
 ```
 
+### Local development: sync to an unpacked folder
+
+If you load the extension unpacked from a folder other than the repo, keep that
+folder in sync with one command:
+
+```bash
+python tools/sync-to-brave.py "C:\path\to\unpacked-folder"
+```
+
+The target can also come from the `BRAVE_UNPACKED_DIR` env var or a git-ignored
+`tools/.sync-target` file (one line with the path). After syncing, press the
+reload button on the extension in `brave://extensions`.
+
+> Tip: the cleanest setup is to load the extension unpacked **directly from the
+> repo folder**, which avoids needing to sync at all.
+
 ---
 
 ## Background — why YouTube shows abbreviated metadata
