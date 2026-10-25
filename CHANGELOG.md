@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.16]
+
+### Performance
+
+- Scanning is now fully non-blocking. The observer only enqueues inserted
+  subtrees; the DOM walking runs in idle time slices and yields every 64 nodes.
+  Previously a large insertion (loading a watch page) was walked synchronously
+  inside the observer callback, blocking the main thread exactly while the video
+  player initialized and causing the playback time to reset several times.
+
 ## [1.1.15]
 
 ### Performance

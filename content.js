@@ -90,58 +90,84 @@
     log('Restored:', JSON.stringify(value), '->', JSON.stringify(output));
   }
 
-  // Walk only the given subtree (never the whole document).
-  function scanSubtree(root) {
-    if (root.nodeType === Node.TEXT_NODE) {
-      processTextNode(root);
-      return;
-    }
-    if (root.nodeType !== Node.ELEMENT_NODE) return;
+  // Runs a callback in idle time with a time budget. The setTimeout fallback
+  // emulates a ~8 ms budget so it still yields on browsers without rIC.
+  const runWhenIdle = typeof window.requestIdleCallback === 'function'
+    ? (cb) => window.requestIdleCallback(cb, { timeout: 500 })
+    : (cb) => {
+        const start = Date.now();
+        setTimeout(() => cb({ timeRemaining: () => Math.max(0, 8 - (Date.now() - start)) }), 16);
+      };
 
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      processTextNode(n);
-    }
+  // Non-blocking scan pipeline. The observer only enqueues work; the actual DOM
+  // walking happens in idle slices and yields every 64 nodes, so a large
+  // insertion (a whole watch page) never blocks the main thread while the video
+  // player is initializing. We do NOT observe characterData (it would make the
+  // browser track the player's constant time/caption updates).
+  const pendingRoots = [];   // subtrees queued to walk
+  const pendingWalkers = []; // TreeWalkers paused mid-walk, to resume later
+  let flushScheduled = false;
+
+  function enqueueScan(root) {
+    if (!root) return;
+    pendingRoots.push(root);
+    scheduleFlush();
   }
 
-  // We only react to inserted nodes. We deliberately do NOT observe
-  // `characterData`: tracking every text change across the whole document forces
-  // the browser to record the player's constant time/caption/progress updates
-  // while the video initializes, which hurts playback startup. In-place metadata
-  // updates are instead caught by the idle full scan on YouTube's SPA events.
+  function scheduleFlush() {
+    if (flushScheduled) return;
+    flushScheduled = true;
+    runWhenIdle(flushWork);
+  }
+
+  // Kept name: schedules a full-document pass (used on load and SPA navigation).
+  function scheduleFullScan() {
+    enqueueScan(document.body);
+  }
+
+  // Processes text nodes from a walker until it finishes (true) or the time
+  // budget runs out (false, so it can be resumed in a later slice).
+  function drainWalker(walker, hasBudget) {
+    let node;
+    let count = 0;
+    while ((node = walker.nextNode())) {
+      processTextNode(node);
+      if ((++count & 63) === 0 && !hasBudget()) return false;
+    }
+    return true;
+  }
+
+  function flushWork(deadline) {
+    flushScheduled = false;
+    const hasBudget = () =>
+      !deadline || typeof deadline.timeRemaining !== 'function' || deadline.timeRemaining() > 3;
+
+    while (pendingWalkers.length && hasBudget()) {
+      if (drainWalker(pendingWalkers[0], hasBudget)) pendingWalkers.shift();
+    }
+    while (pendingRoots.length && hasBudget()) {
+      const root = pendingRoots.shift();
+      if (!root || root.isConnected === false) continue;
+      if (root.nodeType === Node.TEXT_NODE) { processTextNode(root); continue; }
+      if (root.nodeType !== Node.ELEMENT_NODE) continue;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      if (!drainWalker(walker, hasBudget)) pendingWalkers.push(walker);
+    }
+
+    if (pendingWalkers.length || pendingRoots.length) scheduleFlush();
+  }
+
+  // The observer stays trivial: enqueue inserted subtrees and return immediately.
   function onMutations(mutations) {
     for (const mutation of mutations) {
-      for (const added of mutation.addedNodes) scanSubtree(added);
+      for (const added of mutation.addedNodes) enqueueScan(added);
     }
   }
 
   function startObserver() {
     if (observer) return;
     observer = new MutationObserver(onMutations);
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-    });
-  }
-
-  function fullScan() {
-    if (document.body) scanSubtree(document.body);
-  }
-
-  // Coalesce full scans and run them when the main thread is idle, so they don't
-  // compete with page/video rendering. Multiple triggers collapse into one scan.
-  let scanScheduled = false;
-  const runWhenIdle = typeof window.requestIdleCallback === 'function'
-    ? (cb) => window.requestIdleCallback(cb, { timeout: 500 })
-    : (cb) => setTimeout(cb, 0);
-
-  function scheduleFullScan() {
-    if (scanScheduled) return;
-    scanScheduled = true;
-    runWhenIdle(() => {
-      scanScheduled = false;
-      fullScan();
-    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
   }
 
   function registerSpaNavigation() {
