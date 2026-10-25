@@ -64,7 +64,6 @@
     const value = node.nodeValue;
     if (!value || !isCandidateText(value)) return;
     if (lastOutputs.get(node) === value) return;
-    if (isInInteractiveElement(node)) return;
 
     // Kind implied by the node's own text (cheap regex, no DOM walk).
     let contextKind = hasSubscriberSignal(value) ? 'subscribers'
@@ -81,6 +80,10 @@
 
     const output = transformMetadataText(value, effective, metadata, contextKind);
     if (output === null || output === value) return;
+
+    // Expensive ancestor check runs only when we actually have a replacement,
+    // so the player's constant time/caption updates stay cheap.
+    if (isInInteractiveElement(node)) return;
 
     node.nodeValue = output; // only the visible text is changed, never the HTML
     lastOutputs.set(node, output);
@@ -127,11 +130,27 @@
     if (document.body) scanSubtree(document.body);
   }
 
+  // Coalesce full scans and run them when the main thread is idle, so they don't
+  // compete with page/video rendering. Multiple triggers collapse into one scan.
+  let scanScheduled = false;
+  const runWhenIdle = typeof window.requestIdleCallback === 'function'
+    ? (cb) => window.requestIdleCallback(cb, { timeout: 500 })
+    : (cb) => setTimeout(cb, 0);
+
+  function scheduleFullScan() {
+    if (scanScheduled) return;
+    scanScheduled = true;
+    runWhenIdle(() => {
+      scanScheduled = false;
+      fullScan();
+    });
+  }
+
   function registerSpaNavigation() {
     for (const eventName of YT_NAVIGATION_EVENTS) {
       document.addEventListener(eventName, () => {
         recomputeEffective(); // the UI language might have changed
-        queueMicrotask(fullScan);
+        scheduleFullScan();
       }, { passive: true });
     }
   }
@@ -144,7 +163,7 @@
       console.warn(LOG_PREFIX, 'Could not read the options:', err);
     }
     recomputeEffective();
-    fullScan();
+    scheduleFullScan();
   }
 
   function watchSettings() {
@@ -155,7 +174,7 @@
         if (key in settings) settings[key] = newValue;
       }
       recomputeEffective();
-      fullScan();
+      scheduleFullScan();
     });
   }
 
@@ -166,9 +185,9 @@
     loadSettings();
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fullScan, { once: true });
+      document.addEventListener('DOMContentLoaded', scheduleFullScan, { once: true });
     } else {
-      fullScan();
+      scheduleFullScan();
     }
   }
 

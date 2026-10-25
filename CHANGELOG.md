@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.14]
+
+### Performance
+
+- The interactive-widget check (`closest()`) now runs only when there is an
+  actual replacement, instead of for every number. This makes the player's
+  constant time/caption updates nearly free and reduces work while a video is
+  loading or playing.
+- Full scans are coalesced and run on `requestIdleCallback`, so repeated SPA
+  events (`yt-page-data-updated`) no longer trigger multiple full-body walks
+  that compete with rendering.
+
 ## [1.1.13]
 
 ### Performance
