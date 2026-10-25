@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.15]
+
+### Performance
+
+- Stopped observing `characterData`. Tracking every text change across the whole
+  document made the browser record the player's constant time/caption/progress
+  updates during video startup, which could cause the time display to flicker
+  (0:00/15:00 -> 00:00/00:00) and the video to appear to load twice. Inserted
+  nodes are still handled via `childList`, and in-place metadata updates via the
+  idle full scan on SPA events.
+
 ## [1.1.14]
 
 ### Performance

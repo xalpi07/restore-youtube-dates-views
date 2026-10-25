@@ -104,15 +104,14 @@
     }
   }
 
+  // We only react to inserted nodes. We deliberately do NOT observe
+  // `characterData`: tracking every text change across the whole document forces
+  // the browser to record the player's constant time/caption/progress updates
+  // while the video initializes, which hurts playback startup. In-place metadata
+  // updates are instead caught by the idle full scan on YouTube's SPA events.
   function onMutations(mutations) {
     for (const mutation of mutations) {
-      if (mutation.type === 'characterData') {
-        if (mutation.target.nodeType === Node.TEXT_NODE) {
-          processTextNode(mutation.target);
-        }
-      } else if (mutation.type === 'childList') {
-        for (const added of mutation.addedNodes) scanSubtree(added);
-      }
+      for (const added of mutation.addedNodes) scanSubtree(added);
     }
   }
 
@@ -122,7 +121,6 @@
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true,
-      characterData: true,
     });
   }
 
